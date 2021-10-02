@@ -11,12 +11,16 @@ import java.util.List;
 public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
     private static final String SQL_QUERY_SEARCH_QUESTION_BY_TOPIC =
-            "SELECT name, content, difficulty FROM topic INNER JOIN question ON " +
-                    "topic.ID = question.topic_ID WHERE UPPER(name) LIKE UPPER(?)";
+            "SELECT name,content,difficulty FROM topic INNER JOIN question ON topic.ID = question.topic_ID WHERE name LIKE ?";
     //private static final String SQL_QUERY_SAVE_NEW_QUESTION;
 
     public List<Question> searchQuestion(String topic) throws DaoException {
-
+        int track = 0;
+        if (topic.isEmpty()) {
+            System.out.println("No empty input allowed!");
+            return null;
+        }
+        //topic = topic.toLowerCase();
         List<Question> result_question = new LinkedList<>();
 
         try (
@@ -28,13 +32,17 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
             //Since def_query is filled with setString we can execute it
             ResultSet data = def_query.executeQuery();
-
             while (data.next()) {
+                track++;
                 //Read first and second column in table user
                 //System.out.println(data.getLong(1) + " ::: " + data.getString(2));
-                Question output = new Question(data.getString("content"), data.getInt("difficulty"),
-                        data.getString("name"));
+                Question output = new Question(data.getString("name"), data.getString("content"),
+                        data.getInt("difficulty"));
                 result_question.add(output);
+            }
+            if (track == 0) {
+                System.out.println("\nNo questions defined int that topic...\n");
+                return new LinkedList<> ();
             }
         } catch (Exception sql_ex) {
             throw new DaoException(sql_ex);
