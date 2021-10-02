@@ -1,0 +1,15 @@
+
+Problem :::
+    Caused by: java.sql.SQLInvalidAuthorizationSpecException: (conn=41) Access denied for user ...
+
+Solution ::: Seems, that you have no rights to access database, so
+
+1. Enter db as root (sudo mysql)
+2. Create new user without password (CREATE USER 'user'@'%' IDENTIFIED BY '';), where 'user' can be replaced
+on any custom name, though
+3. Grant that user with privileges for any db found under mysql (grant all privileges on *.* to 'user'@'%' with grant option;)
+4. Exit db
+5. Enter db using (mysql -u user)
+6. Try to (USE database), where 'database' is the name of db. You WILL be allowed to enter, therefore you can
+connect to it through the browser as well!
+
