@@ -2,6 +2,7 @@ package kuehne.nagel.config;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class Config {
@@ -14,7 +15,7 @@ public class Config {
     private static Properties properties = new Properties();
 
     //threads handle
-    public synchronized static String return_property (String property_name) throws Exception {
+    public synchronized static String return_property (String property_name) throws IOException {
         if (properties.isEmpty()) {
            try (
                    BufferedInputStream inputStream = new BufferedInputStream(
@@ -23,10 +24,11 @@ public class Config {
                            new FileInputStream("src/main/resources/application.properties"))
            ) {
                properties.load(inputStream);
-           } catch (Exception ioex) {
-               ioex.printStackTrace();
+           } catch (IOException ioex) {
+               //ioex.printStackTrace();
                //if properties failed to load APP GOES DOWN
-               throw new RuntimeException(ioex);
+               System.err.println("\nError occurred inside Config class --> return_property method\n");
+               throw new IOException();
            }
         }
         return properties.getProperty(property_name);

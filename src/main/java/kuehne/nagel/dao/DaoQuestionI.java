@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DaoQuestionI {
 
-    public List<Question> searchQuestion(String topic) throws DaoException;
+    public List<Question> searchQuestion(String topic) throws SQLException;//throws DaoException;
 
-  //  public void saveQuestion(String topic, String response) throws DaoException;
+  //  public void saveQuestion(Question question, Response answers_for_question) throws DaoException;
 }

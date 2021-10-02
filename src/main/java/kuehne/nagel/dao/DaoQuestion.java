@@ -14,19 +14,23 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             "SELECT name,content,difficulty FROM topic INNER JOIN question ON topic.ID = question.topic_ID WHERE name LIKE ?";
     //private static final String SQL_QUERY_SAVE_NEW_QUESTION;
 
-    public List<Question> searchQuestion(String topic) throws DaoException {
+    public List<Question> searchQuestion(String topic) throws SQLException {
         int track = 0;
         if (topic.isEmpty()) {
-            System.out.println("No empty input allowed!");
-            return null;
+            return new LinkedList<>();
         }
         //topic = topic.toLowerCase();
         List<Question> result_question = new LinkedList<>();
+        Connection connect = null;
+        PreparedStatement def_query = null;
 
-        try (
-                Connection connect = DatabaseConnection.getConnectionToDb();
-                PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_SEARCH_QUESTION_BY_TOPIC);
-        ) {
+        try {
+            connect = DatabaseConnection.getConnectionToDb();
+            if (connect == null) {
+                //System.err.println("\nError occurred inside Config class --> return_property method\n");
+                return new LinkedList<>();
+            }
+            def_query = connect.prepareStatement(SQL_QUERY_SEARCH_QUESTION_BY_TOPIC);
             //plug topic into '?' of SQL_QUERY_SEARCH...
             def_query.setString(1, topic);
 
@@ -41,11 +45,17 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
                 result_question.add(output);
             }
             if (track == 0) {
-                System.out.println("\nNo questions defined int that topic...\n");
+                //System.out.println("\nNo questions defined in that topic...\n");
                 return new LinkedList<> ();
             }
-        } catch (Exception sql_ex) {
-            throw new DaoException(sql_ex);
+        } catch (SQLException sql_ex) {
+            throw new SQLException();
+            //throw new DaoException(sql_ex);
+            //System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
+            //return null;
+        } finally {
+            connect.close();
+            def_query.close();
         }
         return result_question;
     }
