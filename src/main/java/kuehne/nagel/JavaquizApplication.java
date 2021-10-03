@@ -1,35 +1,32 @@
 package kuehne.nagel;
 
-import kuehne.nagel.dao.DaoQuestion;
-import kuehne.nagel.utils.SearchQuestionByTopic;
+import kuehne.nagel.utils.*;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JavaquizApplication {
 
 	public static void main(String[] args) {
-		//DaoQuestion daoq = new DaoQuestion();
 		List<Question> queryResult;
-		SearchQuestionByTopic new_search = new SearchQuestionByTopic();
-		new_search.searchQuestionByTopic("");
-		new_search.searchQuestionByTopic("Cars");
-		new_search.searchQuestionByTopic("34f3gnc");
-		/*try {
-			queryResult = daoq.searchQuestion("");
-			if (queryResult.isEmpty()) {
-				//System.out.println("\nNo question on that topic...\n");
-				return;
-			}
-			for (Question question:queryResult) {
+		//SearchQuestionByTopic new_search = new SearchQuestionByTopic();
+		//new_search.searchQuestionByTopic("");
+		//queryResult = new_search.searchQuestionByTopic("Cars");
+		//new_search.searchQuestionByTopic("34f3gnc");
 
-				System.out.printf("Topic name ::: %s\nQuestion ::: %s\nDifficulty ::: %d\n\n", question.getTopic_name(),
-						question.getContent(), question.getDifficulty());
-			}
-		} catch (NullPointerException nullPointerException) {
-			//System.err.println("No empty input allowed!\n");
-		}
+		//SearchTopicIDbyTopicName new_s2 = new SearchTopicIDbyTopicName();
+		//SearchQuestionIDbyQuestionName new_s3 = new SearchQuestionIDbyQuestionName();
+		//System.out.println(new_s3.searchQuestionIdByQuestionName("What is the first car invented?"));
+		SaveQuestion save1 = new SaveQuestion();
+		List<Response> ANSWERS_TO_GO = new LinkedList<>();
+		ANSWERS_TO_GO.add(new Response("m000ke"));
+		ANSWERS_TO_GO.add(new Response("myke"));
+		save1.saveQuestion("Which is my colocxzxcr?", 4,"Cars", ANSWERS_TO_GO);
+		/*CreateTopic ct = new CreateTopic();
+		ct.createTopicIfEmpty("Guns");*/
+		/*GetUnusedId gu = new GetUnusedId();
+		System.out.println(gu.getUnusedId("topic"));*/
 
-		}*/
 	}
 }
