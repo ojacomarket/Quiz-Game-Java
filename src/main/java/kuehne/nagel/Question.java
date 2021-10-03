@@ -2,6 +2,8 @@ package kuehne.nagel;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -16,4 +18,5 @@ public class Question {
     @NonNull
     private int difficulty;
     private int topic_id;
+    private List<Response> answers;
 }
