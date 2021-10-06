@@ -22,7 +22,7 @@ abstract public class DatabaseConnection {
             return null;
         }
         catch (SQLException sqlex) {
-            System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
+           // System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
             throw new SQLException();
         }
         System.out.println("\nSuccessfully connected to the database!\n");

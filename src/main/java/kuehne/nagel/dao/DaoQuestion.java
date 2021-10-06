@@ -5,6 +5,7 @@ import kuehne.nagel.Response;
 import kuehne.nagel.utils.GetUnusedId;
 import kuehne.nagel.utils.SearchQuestionIDbyQuestionName;
 import kuehne.nagel.utils.SearchTopicIDbyTopicName;
+import kuehne.nagel.utils.VerifyQuestionDuplicate;
 import lombok.Data;
 
 import java.sql.*;
@@ -22,7 +23,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
     private static final String SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION = "INSERT INTO response (answer, question_ID) VALUES (?,?)";
     private static final String SQL_QUERY_RETRIEVE_UNUSED_ID = "SELECT MAX(ID) FROM ";
     private static final String SQL_QUERY_CREATE_TOPIC = "INSERT INTO topic (name) VALUES (?)";
-
+    private static final String SQL_QUERY_TOPIC_ID_FROM_QUESTION_TABLE = "SELECT topic_ID FROM question WHERE content=?";
 
     public List<Question> searchQuestion(String topic) throws SQLException {
         int track = 0;
@@ -75,18 +76,31 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
         //int topic_ID;
         int question_ID;
+        int verify;
+
         /*SearchTopicIDbyTopicName search_topic_id = new SearchTopicIDbyTopicName();
         topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);*/
         SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
         question_ID = search_question_id.searchQuestionIdByQuestionName(question);
+        System.out.println("QUESTION ID IS "+question_ID);
 
-        if (topic_ID == 0 || question_ID == 0) {
-            if (question_ID == 0) {
+        if (/*topic_ID == 0 || */question_ID == 0) {
+            //if (question_ID == 0) {
                 GetUnusedId new_q_id = new GetUnusedId();
                 question_ID = new_q_id.getUnusedId("question") + 1;
-            } else
-            return 1;
+            } else {
+            VerifyQuestionDuplicate verification = new VerifyQuestionDuplicate();
+            verify = verification.verifyQuestionDuplicate(topic,question);
+            if (verify == 3) {
+                System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n");
+                return 0;
+            }
+            //return 1;
         }
+        //}
+       /* else if (question_ID > 0) {
+            return 0;
+        }*/
      //   System.err.println(question_ID);
      //   Question result_question;
         Connection connect = null;
@@ -146,11 +160,13 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         return 0;
     }
     public int getExistingTopicId(String topic) throws SQLException {
+
         int track = 0;
-        if (topic.isEmpty()) {
-            return 0;
-        }
         int topic_ID = 0;
+
+        if (topic.isEmpty()) {
+            return 2;
+        }
         Connection connect = null;
         PreparedStatement def_query = null;
 
@@ -158,7 +174,8 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             connect = DatabaseConnection.getConnectionToDb();
             if (connect == null) {
                 //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 0;
+               // return 0; //TODO: added new error code return 1
+                return 1;
             }
             def_query = connect.prepareStatement(SQL_QUERY_TOPIC_ID_BY_TOPIC_NAME);
             //plug topic into '?' of SQL_QUERY_SEARCH...
@@ -166,16 +183,20 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
             //Since def_query is filled with setString we can execute it
             ResultSet data = def_query.executeQuery();
+            //TODO: freshly added
+            //topic_ID = data.getInt("ID");
+            //TODO: commented out
             while (data.next()) {
                 track++;
 
                 topic_ID = data.getInt("ID");
             }
-            if (track == 0) {
+            /*if (track == 0) {
                 //System.out.println("\nNo questions defined in that topic...\n");
                 return 0;
-            }
+            }*/
         } catch (SQLException sql_ex) {
+            sql_ex.printStackTrace();
             throw new SQLException();
             //throw new DaoException(sql_ex);
             //System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
@@ -228,6 +249,48 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             def_query.close();
         }
         return question_ID;
+    }
+    public int getTopicIdFromQuestionTable(String question) throws SQLException {
+        int track = 0;
+        if (question.isEmpty()) {
+            return 0;
+        }
+        int question_topic_ID = 0;
+        Connection connect = null;
+        PreparedStatement def_query = null;
+
+        try {
+            connect = DatabaseConnection.getConnectionToDb();
+            if (connect == null) {
+                //System.err.println("\nError occurred inside Config class --> return_property method\n");
+                return 0;
+            }
+            def_query = connect.prepareStatement(SQL_QUERY_TOPIC_ID_FROM_QUESTION_TABLE);
+            //plug topic into '?' of SQL_QUERY_SEARCH...
+            def_query.setString(1, question);
+
+
+            //Since def_query is filled with setString we can execute it
+            ResultSet data = def_query.executeQuery();
+            while (data.next()) {
+                track++;
+
+                question_topic_ID = data.getInt("topic_ID");
+            }
+            if (track == 0) {
+                //System.out.println("\nNo questions defined in that topic...\n");
+                return 0;
+            }
+        } catch (SQLException sql_ex) {
+            throw new SQLException();
+            //throw new DaoException(sql_ex);
+            //System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
+            //return null;
+        } finally {
+            connect.close();
+            def_query.close();
+        }
+        return question_topic_ID;
     }
     public int getUnusedIDs(String table) throws SQLException {
         int track = 0;
