@@ -36,17 +36,16 @@ import static org.junit.jupiter.api.Assertions.*;
      void if_topic_doesnt_exist_return_empty_list() {
          assertEquals(EMPTY_LIST, interactWithDb.searchQuestion("3rf3rg"));
      }
-    /* @Test
+     @Test
      @DisplayName("PART 1: Search question by topic: TEST 3: If topic does exist we get data from it," +
              " namely topic name, content of question and difficulty level")
      void if_topic_does_exist_return_list_with_topic_question_and_difficulty_lvl() {
          LIST_TO_BE_FILLED.add(CARS1);
          LIST_TO_BE_FILLED.add(CARS2);
          LIST_TO_BE_FILLED.add(CARS3);
-         SearchQuestionByTopic new_search = new SearchQuestionByTopic();
-         assertEquals(LIST_TO_BE_FILLED, new_search.searchQuestionByTopic("Cars"));
+         assertEquals(LIST_TO_BE_FILLED, interactWithDb.searchQuestion("Cars"));
      }
-     @Test
+    /* @Test
      @DisplayName("PART 2: Save question: TEST 1: If we input empty string on saving query" +
              " we will get 0")
      void no_topic_on_question_returns_0() {
