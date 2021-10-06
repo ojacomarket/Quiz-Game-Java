@@ -14,7 +14,7 @@ public class SearchQuestionIDbyQuestionName {
         try {
             queryResult = daoq.getExistingQuestionId(question);
             if (queryResult == 0) {
-                System.out.println("\nNo such a question...\n");
+                //System.out.println("\nNo such a question...\n");
                 return queryResult;
             }
         } catch (

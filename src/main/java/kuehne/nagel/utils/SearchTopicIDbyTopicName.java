@@ -18,7 +18,12 @@ public class SearchTopicIDbyTopicName {
         try {
         queryResult = daoq.getExistingTopicId(topic);
         if (queryResult == 0) {
-            System.err.println("\nNo such a topic...\n");
+            //System.err.println("\nNo such a topic...\n");
+            return queryResult;
+        } else if (queryResult == 1) {
+            return queryResult;
+        }
+        else if (queryResult == 2) {
             return queryResult;
         }
     } catch (SQLException exep) {
