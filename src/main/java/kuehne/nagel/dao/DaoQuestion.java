@@ -9,10 +9,12 @@ import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
+import static kuehne.nagel.SqlQueries.*;
+
 @Data
 public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
-    private static final String SQL_QUERY_SEARCH_QUESTION_BY_TOPIC =
+  /*  private static final String SQL_QUERY_SEARCH_QUESTION_BY_TOPIC =
             "SELECT name,content,difficulty FROM topic INNER JOIN question ON topic.ID = question.topic_ID WHERE name LIKE ?";
     private static final String SQL_QUERY_SAVE_QUESTION_TO_EXISTING_TOPIC = "INSERT INTO question (content, difficulty, topic_ID) VALUES (?,?,?)";
     private static final String SQL_QUERY_TOPIC_ID_BY_TOPIC_NAME = "SELECT ID FROM topic WHERE name=?";
@@ -24,7 +26,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
     private static final String SQL_UPDATE_QUESTION_TO_EXISTING_TOPIC = "UPDATE question SET content=?, difficulty=? WHERE ID=?";
     private static final String SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION = "DELETE FROM response WHERE question_ID=?";
     //private static final String SQL_TRIGGER_TO_ADD_QUESTION_AND_ANSWER = "DELIMITER ^_^ CREATE TRIGGER trig BEFORE INSERT ON response FOR EACH ROW BEGIN INSERT INTO question(content, difficulty, topic_ID) values (?,?,?); END^_^";
-    private static final String SQL_QUERY_TO_DELETE_QUESTION = "DELETE FROM question WHERE ID=?";
+    private static final String SQL_QUERY_TO_DELETE_QUESTION = "DELETE FROM question WHERE ID=?";*/
 
     public List<Question> searchQuestion(String topic) throws SQLException {
         int track = 0;
