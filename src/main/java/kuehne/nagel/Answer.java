@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class Response {
+public class Answer {
 
     private int id;
     @NonNull
@@ -14,7 +14,7 @@ public class Response {
     @NonNull
     private int question_id;
 
-    public Response (String answer) {
+    public Answer(String answer) {
         this.answer = answer;
     }
 }
