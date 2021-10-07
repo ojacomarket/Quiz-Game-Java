@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 @Deprecated
-public class SearchTopicIDbyTopicName {
+public class SearchTopicIDbyTopicNameUtil {
 
-    @Getter
+  /*  @Getter
     private int queryResult;
 
     public int searchTopicIDbyTopicName (String topic) {
@@ -30,5 +30,5 @@ public class SearchTopicIDbyTopicName {
         return 0;
     }
         return queryResult;
-}
+}*/
 }

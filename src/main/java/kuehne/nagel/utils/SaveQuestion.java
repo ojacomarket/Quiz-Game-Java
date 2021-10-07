@@ -1,21 +1,20 @@
 package kuehne.nagel.utils;
 
-import kuehne.nagel.Response;
+import kuehne.nagel.Answer;
 import kuehne.nagel.dao.DaoQuestion;
-import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.List;
-
+@Deprecated
 public class SaveQuestion {
 
-    public int saveQuestion(String topic, String question, int difficulty, List<Response> answers) {
+   /* public int saveQuestion(String topic, String question, int difficulty, List<Answer> answers) {
 
         int topic_ID;
         int queryResult;
 
         DaoQuestion daoq = new DaoQuestion();
-        SearchTopicIDbyTopicName search_topic_id = new SearchTopicIDbyTopicName();
+        SearchTopicIDbyTopicNameUtil search_topic_id = new SearchTopicIDbyTopicNameUtil();
         //If topic exists in db, the ID of that topic is returned, so we can proceed forward
         topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);
         //System.out.println("TOPIC ID IS "+topic_ID);
@@ -55,5 +54,5 @@ public class SaveQuestion {
             return 1;
         }
         return queryResult;
-    }
+    }*/
 }

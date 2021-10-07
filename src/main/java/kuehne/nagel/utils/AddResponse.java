@@ -1,6 +1,6 @@
 package kuehne.nagel.utils;
 
-import kuehne.nagel.Response;
+import kuehne.nagel.Answer;
 import kuehne.nagel.dao.DatabaseConnection;
 
 import java.sql.Connection;
@@ -9,20 +9,20 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class AddResponse {
-    public int addResponse (String query, List<Response> answers, int question_ID) throws SQLException {
+    public int addResponse (String query, List<Answer> answers, int question_ID) throws SQLException {
         Connection connect = null;
         PreparedStatement def_query;
         PreparedStatement def_query2;
 
         try {
-            connect = DatabaseConnection.getConnectionToDb();
+            connect = DatabaseConnection.getConnectionToDb(1);
             if (connect == null) {
                 //System.err.println("\nError occurred inside Config class --> return_property method\n");
                 return 2;
             }
             connect.setAutoCommit(false);
         def_query2 = connect.prepareStatement(query);
-        for (Response answer:answers
+        for (Answer answer:answers
         ) {
             def_query2.setString(1,answer.getAnswer());
             def_query2.setInt(2, question_ID);

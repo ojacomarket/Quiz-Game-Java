@@ -3,21 +3,21 @@ package kuehne.nagel.utils;
 
 import kuehne.nagel.Question;
 import kuehne.nagel.dao.DaoQuestion;
-import lombok.Getter;
 
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-
+@Deprecated
 public class SearchQuestionByTopic {
 
-    @Getter
-    private List<Question> queryResult;
+   //@Getter
+    //private List<Question> queryResult;
 
-    public List<Question> searchQuestionByTopic(String topic) {
+   /* public List<Question> searchQuestionByTopic(String topic) {
+        List<Question> queryResult;
         DaoQuestion daoq = new DaoQuestion();
         try {
-            queryResult = daoq.searchQuestion(topic);
+            queryResult = searchQuestionUtil(topic);
             if (queryResult.isEmpty()) {
                 System.out.println("\nNo question on that topic...\n");
                 return queryResult;
@@ -31,6 +31,6 @@ public class SearchQuestionByTopic {
             return new LinkedList<>();
         }
         return queryResult;
-    }
+    }*/
 }
 

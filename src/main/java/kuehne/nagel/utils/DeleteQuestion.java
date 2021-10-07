@@ -1,19 +1,17 @@
 package kuehne.nagel.utils;
 
-import kuehne.nagel.Response;
 import kuehne.nagel.dao.DaoQuestion;
 
 import java.sql.SQLException;
-import java.util.List;
-
+@Deprecated
 public class DeleteQuestion {
-    public int deleteQuestion(String topic, String question) {
+   /* public int deleteQuestion(String topic, String question) {
 
         int topic_ID;
         int queryResult;
 
         DaoQuestion daoq = new DaoQuestion();
-        SearchTopicIDbyTopicName search_topic_id = new SearchTopicIDbyTopicName();
+        SearchTopicIDbyTopicNameUtil search_topic_id = new SearchTopicIDbyTopicNameUtil();
         //If topic exists in db, the ID of that topic is returned, so we can proceed forward
         topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);
         System.out.println("TOPIC ID IS "+topic_ID);
@@ -42,5 +40,5 @@ public class DeleteQuestion {
             return 1;
         }
         return queryResult;
-    }
+    }*/
 }

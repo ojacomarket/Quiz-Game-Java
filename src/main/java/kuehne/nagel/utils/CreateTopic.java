@@ -1,20 +1,18 @@
 package kuehne.nagel.utils;
 
-import kuehne.nagel.Response;
 import kuehne.nagel.dao.DaoQuestion;
 import lombok.Getter;
 
 import java.sql.SQLException;
-import java.util.List;
-
+@Deprecated
 public class CreateTopic {
     @Getter
     private int queryResult;
 
-    public int createTopicIfEmpty(String topic) {
+  /*  public int createTopicIfEmpty(String topic) {
         DaoQuestion daoq = new DaoQuestion();
         int topic_ID;
-        SearchTopicIDbyTopicName search_topic_id = new SearchTopicIDbyTopicName();
+        SearchTopicIDbyTopicNameUtil search_topic_id = new SearchTopicIDbyTopicNameUtil();
         topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);
 
         if (topic_ID != 0) {
@@ -31,5 +29,5 @@ public class CreateTopic {
             return 1;
         }
         return queryResult;
-    }
+    }*/
 }

@@ -4,15 +4,15 @@ import kuehne.nagel.dao.DaoQuestion;
 import lombok.Getter;
 
 import java.sql.SQLException;
-
+@Deprecated
 public class SearchQuestionIDbyQuestionName {
-    @Getter
+  /*  @Getter
     private int queryResult;
 
     public int searchQuestionIdByQuestionName (String question) {
         DaoQuestion daoq = new DaoQuestion();
         try {
-            queryResult = daoq.getExistingQuestionId(question);
+            queryResult = daoq.getExistingQuestionIdUtil(question);
             if (queryResult == 0) {
                 //System.out.println("\nNo such a question...\n");
                 return queryResult;
@@ -22,5 +22,5 @@ public class SearchQuestionIDbyQuestionName {
             return 0;
         }
         return queryResult;
-    }
+    }*/
 }

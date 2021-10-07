@@ -1,17 +1,18 @@
 package kuehne.nagel.utils;
 
-import kuehne.nagel.Response;
+import kuehne.nagel.Answer;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+@Deprecated
 public class StoreAnswers {
-    List<Response> storedAnswers = new LinkedList<>();
+    List<Answer> storedAnswers = new LinkedList<>();
 
-    public List<Response> saveAnswerLocally(String ... answers) {
+    public List<Answer> saveAnswerLocally(String ... answers) {
+        List<Answer> storedAnswers = new LinkedList<>();
         for (String answer : answers) {
-            storedAnswers.add(new Response(answer));
+            storedAnswers.add(new Answer(answer));
         }
         return storedAnswers;
     }

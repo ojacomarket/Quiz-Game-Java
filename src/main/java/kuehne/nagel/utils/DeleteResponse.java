@@ -5,15 +5,15 @@ import kuehne.nagel.dao.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
+@Deprecated
 public class DeleteResponse {
 
-    public int deleteResponse(String query, int question_ID) throws SQLException {
+   /* public int deleteResponse(String query, int question_ID) throws SQLException {
         Connection connect = null;
         PreparedStatement def_query;
         PreparedStatement def_query2;
         try {
-            connect = DatabaseConnection.getConnectionToDb();
+            connect = DatabaseConnection.getConnectionToDb(1);
             if (connect == null) {
                 //System.err.println("\nError occurred inside Config class --> return_property method\n");
                 return 2;
@@ -29,5 +29,5 @@ public class DeleteResponse {
             connect.close();
         }
         return 88;
-    }
+    }*/
 }

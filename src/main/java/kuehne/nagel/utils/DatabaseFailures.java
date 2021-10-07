@@ -1,0 +1,10 @@
+package kuehne.nagel.utils;
+
+public enum DatabaseFailures {
+    TYPO_APPLICATION_PROPERTIES_FILE_NAME,
+    APPLICATION_PROPERTIES_FILE_FAILURE,
+    DATABASE_ABSENCE,
+    INVALID_SQL_QUERY,
+    NO_TABLE,
+    NO_DATA_INSIDE_TABLE
+}
