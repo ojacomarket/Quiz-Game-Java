@@ -13,7 +13,7 @@ public abstract class ValidateInput {
      * @param answers
      * @return
      */
-    public static int validateSavingQuery (String topic, String question, int difficulty, List<Answer> answers) {
+    public static int validateInputQuery(String topic, String question, int difficulty, List<Answer> answers) {
         if (difficulty < 1 || difficulty > 5) {
             System.err.println("APPLICATION >>> Aborting to establish database connection...\n\t\t\t>>>" +
                     " PROBLEM ::: Lowest difficulty level should begin with value of 1 and biggest is 5");
@@ -39,7 +39,7 @@ public abstract class ValidateInput {
         }
         return 1;
     }
-    public static int validateSearchTopicByTopicName (int topic_ID) {
+    /*public static int validateSearchTopicByTopicName (int topic_ID) {
         if (topic_ID == 0) {
             System.err.println("APPLICATION >>> Aborting to receive SQL queries...\n\t\t\t>>>" +
                     " PROBLEM ::: Cannot add question to the topic that doesn't exist");
@@ -51,5 +51,5 @@ public abstract class ValidateInput {
             return -5;
         }
         return 1;
-    }
+    }*/
 }

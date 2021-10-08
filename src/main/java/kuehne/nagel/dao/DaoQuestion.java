@@ -4,7 +4,6 @@ import kuehne.nagel.Answer;
 import kuehne.nagel.Question;
 import kuehne.nagel.exceptions.ApplicationPropertiesException;
 import kuehne.nagel.exceptions.CannotReachDatabaseException;
-import kuehne.nagel.utils.*;
 import lombok.Data;
 
 import java.sql.*;
@@ -36,6 +35,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
 
     public int deleteQuestion(String topic, String question) {
 
+        val
         //int topic_ID;
         int question_ID;
         int verify;
@@ -44,7 +44,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);*/
         //SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
         question_ID = getExistingQuestionIdUtil(question);
-        System.out.println("QUESTION ID IS " + question_ID);
+
 
         if (/*topic_ID == 0 || */question_ID == 0) {
             //if (question_ID == 0) {
@@ -159,79 +159,35 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         response.addResponse(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION,answers,question_ID);
         return 3;
     }*/
-    public int updateQuestion(String topic, String old_question, String new_content, int difficulty, List<Answer> answers) {
-
-        //int topic_ID;
-        int question_ID;
-        int verify;
-
-        /*SearchTopicIDbyTopicNameUtil search_topic_id = new SearchTopicIDbyTopicNameUtil();
-        topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);*/
-        /*SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
-        question_ID = search_question_id.searchQuestionIdByQuestionName(old_question);*/
-
-        verify = verifyQuestionDuplicateUtil(topic, old_question);
-        if (verify == 0) {
-            System.err.println("Question, that doesn't exist, cannot be updated...");
-            return verify;
+    public int updateQuestion(String topic, String old_question, String new_content, int difficulty, String ... new_answers){ //List<Answer> answers) {
+        if (new_content.isEmpty()) {
+            System.err.println("APPLICATION >>> Aborting to run (updateQuestion)...\n\t\t\t>>>" +
+                    " PROBLEM ::: Cannot replace old question with empty string");
+            return 0;
         }
-        // SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
+        List<Answer> answers = prepareAnswers(new_answers);
+        int validation = validateInputQuery(topic,old_question,difficulty,answers);
+        if (validation < 1) {
+            return validation;
+        }
+        int notVerified = verifyQuestionDuplicateUtil(topic, old_question);
+        if (notVerified == 1) {
+            System.err.println("APPLICATION >>> Aborting to run SQL UPDATE query...\n\t\t\t>>>" +
+                    " PROBLEM 1 ::: Question, that doesn't exist, cannot be updated\n\t\t\t>>>" +
+                    " PROBLEM 2 ::: Topic, that doesn't exist, cannot be queried");
+            return notVerified;
+        }
+        int question_ID;
         question_ID = getExistingQuestionIdUtil(old_question);
-        // System.out.println("QUESTION ID IS "+question_ID);
-
-       /* if question_ID == 0) {
-            {
-            GetUnusedId new_q_id = new GetUnusedId();
-            question_ID = new_q_id.getUnusedId("question") + 1;
-        } else {
-            VerifyQuestionDuplicate verification = new VerifyQuestionDuplicate();
-            verify = verification.verifyQuestionDuplicate(topic,question);
-            if (verify == 3) {
-                System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n");
-                return 0;
-            }
-            //return 1;
-        }*/
-        //}
-
-        // Connection connect = null;
-        // PreparedStatement def_query;
-        //PreparedStatement def_query2;
-        //   PreparedStatement def_query3;
-
+        //List<Answer> answers = prepareAnswers(new_answers);
         try (Connection connect = DatabaseConnection.getConnectionToDb(0);
              PreparedStatement def_query = connect.prepareStatement(SQL_UPDATE_QUESTION_TO_EXISTING_TOPIC);
         ) {
-            //connect = DatabaseConnection.getConnectionToDb(0);
-           /* if (connect == null) {
-                //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 2;
-            }*/
-            // connect.setAutoCommit(false);
-            // def_query = connect.prepareStatement(SQL_UPDATE_QUESTION_TO_EXISTING_TOPIC);
-            //plug topic into '?' of SQL_QUERY_SEARCH...
             def_query.setString(1, new_content);
             def_query.setInt(2, difficulty);
             def_query.setInt(3, question_ID);
-            //ResultSet data = def_query.executeUpdate();
             def_query.executeUpdate();
 
-            //Just deletion
-
-           /* def_query2 = connect.prepareStatement(SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION);
-            def_query2.setInt(1, question_ID);
-            def_query2.executeUpdate();*/
-
-            /*def_query3 = connect.prepareStatement(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION);
-            for (Answer answer:answers
-            ) {
-                def_query3.setString(1,answer.getAnswer());
-                def_query3.setInt(2, question_ID);
-                //TODO: Add UPDATE CASCADE to ALL FOREIGN KEYS IN SQL
-                def_query3.executeQuery();
-            }*/
-
-            //  connect.commit();
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
             return -2;
@@ -242,9 +198,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
             return -1;
         }
-        // DeleteResponse del = new DeleteResponse();
         deleteAnswer(SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION, question_ID);
-        // AddResponse ad = new AddResponse();
         addAnswer(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION, answers, question_ID);
         return 3;
     }
@@ -500,7 +454,7 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         int validation;
         List<Answer> ready_answer;
         ready_answer = prepareAnswers(answers);
-        validation = validateSavingQuery(topic, question, difficulty, ready_answer);
+        validation = validateInputQuery(topic, question, difficulty, ready_answer);
 
         if (validation < 1) {
             return validation;
@@ -668,6 +622,9 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         t_id = getTopicIdByTopicNameUtil(topic);
         System.out.println(q_t_id +"    " + t_id);
         if (q_t_id == t_id) {
+            if (q_t_id == 0) {
+                return 1;
+            }
             return 0;
         }
             /*if (queryResult == 0) {
