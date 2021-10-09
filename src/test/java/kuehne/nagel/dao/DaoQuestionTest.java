@@ -1,6 +1,6 @@
 package kuehne.nagel.dao;
 
-import kuehne.nagel.Answer;
+import kuehne.nagel.Response;
 import kuehne.nagel.Question;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ class DaoQuestionTest {
     public static final List<Question> EMPTY_LIST = new LinkedList<>();
     public static final List<Question> LIST_TO_BE_FILLED = new LinkedList<>();
 
-    public static final List<Answer> LIST_TO_BE_FILLED2 = new LinkedList<>();
+    public static final List<Response> LIST_TO_BE_FILLED2 = new LinkedList<>();
     //Only lowercase allowed, otherwise test will fail
     public static final Question MATH = new Question("math", "what is the opposite to differentiating?", 3); //Integrating
 
@@ -27,27 +27,71 @@ class DaoQuestionTest {
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    void empty_topic_returns_empty_list() {
+    void SEARCH_empty_input_for_topic_returns_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic(""));
     }
 
     @Test
-    void topic_doesnt_exist_OR_has_no_questions_returns_empty_list() {
+    void SEARCH_unknown_topic_returns_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Science"));
     }
 
-    //TODO: BEFORE RUN ENSURE, THAT QUESTIONS YOU PROVIDE EXIST IN A QUERIED TABLE
-   /*@Test
-    void topic_exist_questions_exist_returns_filled_list() {
+    //TODO: BEFORE RUN ENSURE, THAT TOPIC YOU PROVIDE EXISTS IN A TOPIC TABLE
+   @Test
+    void SEARCH_existing_topic_returns_filled_list() {
         LIST_TO_BE_FILLED.add(MATH);
-        assertEquals(LIST_TO_BE_FILLED, interactWithDb.showAllQuestionsByTopic("Cars"));
-    }*/
-
+        assertEquals(LIST_TO_BE_FILLED, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT RESPONSE TABLE IS EMPTY
+    @Test
+    void SEARCH_existing_topic_but_empty_response_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT RESPONSE TABLE IS DELETED
+    @Test
+    void SEARCH_existing_topic_but_deleted_response_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT QUESTION TABLE IS EMPTY
+    @Test
+    void SEARCH_existing_topic_but_empty_question_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT QUESTION TABLE IS DELETED
+    @Test
+    void SEARCH_existing_topic_but_deleted_question_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT TOPIC TABLE IS EMPTY
+    @Test
+    void SEARCH_empty_topic_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT TOPIC TABLE IS DELETED
+    @Test
+    void SEARCH_deleted_topic_table_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT DATABASE HAS NO TOPICS AT ALL
+    @Test
+    void SEARCH_empty_db_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT DATABASE IS DELETED
+    @Test
+    void SEARCH_deleted_db_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE INVALID DATA IN APPLICATION.PROPERTIES FILE
+    @Test
+    void SEARCH_invalid_app_prop_file_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Math"));
+    }
     //TODO: BEFORE RUN ENSURE, THAT YOU MAKE TYPO IN APPLICATION.PROPERTIES FILE (LIKE: APP#E#.PROROF)
-    /*@Test
-    void if_problems_with_property_file_return_empty_list() {
+    @Test
+    void SEARCH_typo_in_app_prop_file_returns_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
-    }*/
+    }
 
     //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL QUESTION FROM QUESTION TABLE (FIRST DELETE RESPONSES!)
     /*@Test
@@ -140,80 +184,67 @@ class DaoQuestionTest {
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     @Test
-    @DisplayName("PART 3: Update question: TEST 1: If empty topic name passed, then return -5")
-    void if_empty_topic_return_minus_5() {
-        assertEquals(-5, interactWithDb.updateQuestion("", "Fastest car on a planet?",
-                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
+    void if_empty_topic_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.updateQuestion("", "Fastest car on a planet?",
+                "Slowest car on a planet?", 4, "Dacia Duster"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 2: If empty old question passed, return -4")
-    void if_empty_old_question_return_minus_4() {
-        assertEquals(-4, interactWithDb.updateQuestion("Cars", "",
-                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
+    void if_empty_old_question_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.updateQuestion("Cars", "",
+                "Slowest car on a planet?", 3, "Dacia Duster"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 3: If empty new question passed, return 0")
-    void if_empty_old_question_return_0() {
-        assertEquals(0, interactWithDb.updateQuestion("Cars", "What is my favourite car?",
-                "", 3, "Toyota Lanzz3"));
+    void if_empty_new_question_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.updateQuestion("Cars", "What is my favourite car?",
+                "", 3, "Dacia Duster"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 4: If empty answers passed, return 0")
-    void if_empty_answers_return_0() {
-        assertEquals(-6, interactWithDb.updateQuestion("Cars", "What is the fastest car on a planet?",
+    void if_empty_answers_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.updateQuestion("Cars", "What is the fastest car on a planet?",
                 "Slowest car on a planet?", 3, ""));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 5: If topic doesn't exist return 1")
-    void if_topic_doesnt_exist_return_1() {
-        assertEquals(1, interactWithDb.updateQuestion("Caers", "Fastest car on a planet?",
-                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
+    void UPDATE_if_topic_doesnt_exist_returns_ERROR_CODE_minus_4() {
+        assertEquals(-4, interactWithDb.updateQuestion("Speed", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Dacia Duster"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 6: If question of particular topic doesn't exist," +
-            " return 1")
-    void if_question_doesnt_exist_return_1() {
-        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fassdtest car on a planet?",
-                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
+    void UPDATE_if_question_doesnt_exist_returns_ERROR_CODE_minus_4() {
+        assertEquals(-4, interactWithDb.updateQuestion("Cars", "Fassdtest car on a planet?",
+                "Slowest car on a planet?", 3, "Dacia Duster"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 7: If all data is valid, execute UPDATE query and" +
-            " return 3")
-    void if_all_data_valid_return_3() {
-        assertEquals(3, interactWithDb.updateQuestion("Cars", "Slowest car on a planet?",
-                "Fastest car on a planet?", 3, "Porsche"));
+    void UPDATE_if_all_data_valid_returns_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "What is the year of Tesla company foundation?",
+                "Fastest car on a planet?", 3, "Thrust SSC"));
     }
 
     @Test
-    @DisplayName("PART 3: Update question: TEST 8: If all data is valid, but response table is empty" +
-            " return 3 (we are still able to add answers)")
-    void if_all_data_valid_but_response_table_is_empty_return_3() {
-        assertEquals(3, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
-                "Slowest car on a planet?", 3, "Ymaaha"));
+    void UPDATE_if_all_data_valid_but_response_table_is_empty_return_3() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Slowest car on a planet?",
+                "Fastest car on a planet?", 5, "Dacia Duster"));
     }
 
     //add todo
     //ADD TO ERROR MESSAGE: RESPONSE TABLE IS DOWN
     @Test
-    @DisplayName("PART 3: Update question: TEST 9: If all data is valid, but response table is deleted" +
-            " return 3 (we are still able to add answers)")
-    void if_all_data_valid_but_response_table_is_deleted_return_1() {
-        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
-                "Slowest car on a planet?", 3, "Ymaaha"));
+    void UPDATE_if_all_data_valid_but_response_table_is_data_is_deleted_returns_ERROR_CODE_minus_2() {
+        assertEquals(-2, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Dacia Duster"));
     }
 
     //add todo
     @Test
     @DisplayName("PART 3: Update question: TEST 10: If all data is valid, but question" +
             " table is empty, return 1")
-    void if_all_data_valid_but_question_table_is_empty_return_1() {
-        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+    void if_all_data_valid_but_question_table_is_empty_returns_ERROR_CODE_minus_2() {
+        assertEquals(-2, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
                 "Slowest car on a planet?", 3, "Ymaaha"));
     }
 
