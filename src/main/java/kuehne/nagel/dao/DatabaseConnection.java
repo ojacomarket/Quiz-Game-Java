@@ -3,30 +3,25 @@ package kuehne.nagel.dao;
 import kuehne.nagel.config.Config;
 import kuehne.nagel.exceptions.ApplicationPropertiesException;
 import kuehne.nagel.exceptions.CannotReachDatabaseException;
-import kuehne.nagel.utils.DatabaseConnectivityProblems;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static kuehne.nagel.utils.DatabaseFailures.DATABASE_ABSENCE;
-import static kuehne.nagel.utils.DatabaseFailures.TYPO_APPLICATION_PROPERTIES_FILE_NAME;
-
 abstract public class DatabaseConnection {
     /**
      * Get connection to the database
-     *
-     * @param initialTransaction Type 0 if you connecting for the first time, while 1 will indicate other
-     *                           transaction times within ONE operation (search, save, update, delete)
-     * @return
-     * @throws SQLException
+     * @param initialTransaction 0 if connection for the first time within SQL QUERY, 1 if not for the first time
+     * @return null, if (initalTransaction < 0 || > 1), otherwise connection to the database returned
+     * @throws ApplicationPropertiesException if error in application.properties file
+     * @throws CannotReachDatabaseException can caused by many factors, most common are: database is down or database privileges
      */
     public static Connection getConnectionToDb(int initialTransaction) throws ApplicationPropertiesException, CannotReachDatabaseException {
         if (initialTransaction > 1 || initialTransaction < 0) {
             return null;
         }
-        Connection attemptToConnect = null;
+        Connection attemptToConnect;
         try {
             attemptToConnect = DriverManager.getConnection(
                     Config.return_property(Config.DATABASE_URL),
@@ -36,18 +31,10 @@ abstract public class DatabaseConnection {
                 System.out.println("\t\t\t>>> Successfully connected to the database!\n");
             }
         } catch (IOException ioex) {
-            System.out.println("Im herAAAAAe!");
             throw new ApplicationPropertiesException();
-
-            // throw new IOException();
         } catch (SQLException sqlex) {
-            System.out.println("Im GGG!");
             throw new CannotReachDatabaseException();
-            //DatabaseConnectivityProblems.printConnectivityErrorMessage(DATABASE_ABSENCE);
-
-           // throw new SQLException();
         }
-        System.out.println("Im here!");
         return attemptToConnect;
     }
 }
