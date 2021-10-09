@@ -10,15 +10,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class DaoQuestionTest {
     public static final List<Question> EMPTY_LIST = new LinkedList<>();
     public static final List<Question> LIST_TO_BE_FILLED = new LinkedList<>();
 
     public static final List<Answer> LIST_TO_BE_FILLED2 = new LinkedList<>();
-    public static final Question CARS1 = new Question("cars", "most popular color of nissan?",1);
-    public static final Question CARS2 = new Question("cars", "less popular color of nissan?", 1);
-    public static final Question CARS3 = new Question("cars", "less popular color of yamaha?", 5);
+    //Only lowercase allowed, otherwise test will fail
+    public static final Question MATH = new Question("math", "what is the opposite to differentiating?", 3); //Integrating
 
     DaoQuestion interactWithDb = new DaoQuestion();
 
@@ -27,62 +25,51 @@ class DaoQuestionTest {
     ////////////////////////////////// SEARCH QUERY //////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////////////////////
+
     @Test
-    @DisplayName("PART 1: Search question by topic: TEST 1: If we input empty string on topic query" +
-            " we will get empty list")
-    void no_topic_return_empty_list() {
+    void empty_topic_returns_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic(""));
     }
 
     @Test
-    @DisplayName("PART 1: Search question by topic: TEST 2: If topic doesn't exist we have nothing to do" +
-            " with questions' query, since they simply don't exist either")
-    void if_topic_doesnt_exist_return_empty_list() {
-        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("3rf3rg"));
+    void topic_doesnt_exist_OR_has_no_questions_returns_empty_list() {
+        assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Science"));
     }
-    //TODO: BEFORE RUN ENSURE, THAT YOU GOT FILLED ALL QUESTIONS INTO GIVEN TOPIC CORRECTLY
-   /* @Test
-    @DisplayName("PART 1: Search question by topic: TEST 3: If topic does exist we get data from it," +
-            " namely topic name, content of question and difficulty level")
-    /*void if_topic_does_exist_return_list_with_topic_question_and_difficulty_lvl() {
-        LIST_TO_BE_FILLED.add(CARS1);
-       // LIST_TO_BE_FILLED.add(CARS2);
-       // LIST_TO_BE_FILLED.add(CARS3);
+
+    //TODO: BEFORE RUN ENSURE, THAT QUESTIONS YOU PROVIDE EXIST IN A QUERIED TABLE
+   /*@Test
+    void topic_exist_questions_exist_returns_filled_list() {
+        LIST_TO_BE_FILLED.add(MATH);
         assertEquals(LIST_TO_BE_FILLED, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
-   /* //TODO: BEFORE RUN ENSURE, THAT YOU MESS UP (CHANGE IN A BAD WAY) WITH APPLICATION.PROPERTIES FILE
-    @Test
-    @DisplayName("PART 1: Search question by topic: TEST 4: If problems with property file," +
-            " return empty list")
+
+    //TODO: BEFORE RUN ENSURE, THAT YOU MAKE TYPO IN APPLICATION.PROPERTIES FILE (LIKE: APP#E#.PROROF)
+    /*@Test
     void if_problems_with_property_file_return_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
-    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL QUESTION FROM QUESTIONS TABLE
+
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL QUESTION FROM QUESTION TABLE (FIRST DELETE RESPONSES!)
     /*@Test
-    @DisplayName("PART 1: Search question by topic: TEST 5: If topic does exist BUT questions' table," +
-            " is empty, then we return empty list")
     void if_topic_does_exist_but_question_table_is_empty_return_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
-    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED TOPIC TABLE FROM A DATABASE
+
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL TOPICS FROM TOPIC TABLE
    /*@Test
-    @DisplayName("PART 1: Search question by topic: TEST 6: If topic doesn't exist in a database," +
-            " and the topic table itself is empty, return empty list")
-    void all_tables_are_empty_return_empty_list() {
+    void if_topic_table_doesnt_exist_return_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
+
     //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL TABLES FROM A DATABASE
-   /* @Test
-    @DisplayName("PART 1: Search question by topic: TEST 7: If tables in a QUIZ database doesn't" +
-            " exist, return empty list")
-    void if_tables_are_down_return_empty_list() {
+    /*@Test
+    void no_tables_return_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
+
     //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED DATABASE ITSELF
     /*@Test
-    @DisplayName("PART 1: Search question by topic: TEST 8: If database QUIZ doesn't" +
-            " exist, return empty list")
-    void if_db_is_down_return_empty_list() {
+    void if_database_is_down_return_empty_list() {
         assertEquals(EMPTY_LIST, interactWithDb.showAllQuestionsByTopic("Cars"));
     }*/
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +155,7 @@ class DaoQuestionTest {
     void if_tables_are_down_return_empty_list() {
        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));;
    }*/
-   //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED DATABASE ITSELF
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED DATABASE ITSELF
     /*@Test
     @DisplayName("PART 2: Save question: TEST 12: If QUIZ database doesn't" +
             " exist, return -1")
@@ -182,106 +169,119 @@ class DaoQuestionTest {
     //////////////////////////////////////////////////////////////////////////////////////////////
     @Test
     @DisplayName("PART 3: Update question: TEST 1: If empty topic name passed, then return -5")
-    void if_empty_topic_return_minus_5 () {
-        assertEquals(-5,interactWithDb.updateQuestion("","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Toyota Lanzz3"));
+    void if_empty_topic_return_minus_5() {
+        assertEquals(-5, interactWithDb.updateQuestion("", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 2: If empty old question passed, return -4")
-    void if_empty_old_question_return_minus_4 () {
-        assertEquals(-4,interactWithDb.updateQuestion("Cars","",
-                "Slowest car on a planet?",3, "Toyota Lanzz3"));
+    void if_empty_old_question_return_minus_4() {
+        assertEquals(-4, interactWithDb.updateQuestion("Cars", "",
+                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 3: If empty new question passed, return 0")
-    void if_empty_old_question_return_0 () {
-        assertEquals(0,interactWithDb.updateQuestion("Cars","What is my favourite car?",
-                "",3, "Toyota Lanzz3"));
+    void if_empty_old_question_return_0() {
+        assertEquals(0, interactWithDb.updateQuestion("Cars", "What is my favourite car?",
+                "", 3, "Toyota Lanzz3"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 4: If empty answers passed, return 0")
     void if_empty_answers_return_0() {
-        assertEquals(-6,interactWithDb.updateQuestion("Cars","What is the fastest car on a planet?",
-                "Slowest car on a planet?",3, ""));
+        assertEquals(-6, interactWithDb.updateQuestion("Cars", "What is the fastest car on a planet?",
+                "Slowest car on a planet?", 3, ""));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 5: If topic doesn't exist return 1")
-    void if_topic_doesnt_exist_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Caers","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Toyota Lanzz3"));
+    void if_topic_doesnt_exist_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Caers", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 6: If question of particular topic doesn't exist," +
             " return 1")
-    void if_question_doesnt_exist_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Cars","Fassdtest car on a planet?",
-                "Slowest car on a planet?",3, "Toyota Lanzz3"));
+    void if_question_doesnt_exist_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fassdtest car on a planet?",
+                "Slowest car on a planet?", 3, "Toyota Lanzz3"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 7: If all data is valid, execute UPDATE query and" +
             " return 3")
-    void if_all_data_valid_return_3 () {
-        assertEquals(3,interactWithDb.updateQuestion("Cars","Slowest car on a planet?",
-                "Fastest car on a planet?",3, "Porsche"));
+    void if_all_data_valid_return_3() {
+        assertEquals(3, interactWithDb.updateQuestion("Cars", "Slowest car on a planet?",
+                "Fastest car on a planet?", 3, "Porsche"));
     }
+
     @Test
     @DisplayName("PART 3: Update question: TEST 8: If all data is valid, but response table is empty" +
             " return 3 (we are still able to add answers)")
-    void if_all_data_valid_but_response_table_is_empty_return_3 () {
-        assertEquals(3,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+    void if_all_data_valid_but_response_table_is_empty_return_3() {
+        assertEquals(3, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     //ADD TO ERROR MESSAGE: RESPONSE TABLE IS DOWN
     @Test
     @DisplayName("PART 3: Update question: TEST 9: If all data is valid, but response table is deleted" +
             " return 3 (we are still able to add answers)")
-    void if_all_data_valid_but_response_table_is_deleted_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+    void if_all_data_valid_but_response_table_is_deleted_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     @Test
     @DisplayName("PART 3: Update question: TEST 10: If all data is valid, but question" +
-            " table is empty, return 1" )
-    void if_all_data_valid_but_question_table_is_empty_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+            " table is empty, return 1")
+    void if_all_data_valid_but_question_table_is_empty_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     @Test
     @DisplayName("PART 3: Update question: TEST 11: If all data is valid, but question" +
-            " table is down, return 1" )
-    void if_all_data_valid_but_question_table_is_down_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+            " table is down, return 1")
+    void if_all_data_valid_but_question_table_is_down_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     @Test
     @DisplayName("PART 3: Update question: TEST 12: If all data is valid, but topic" +
-            " table is empty, return 1" )
-    void if_all_data_valid_but_topic_table_is_empty_return_1 () {
-        assertEquals(1,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+            " table is empty, return 1")
+    void if_all_data_valid_but_topic_table_is_empty_return_1() {
+        assertEquals(1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     //when we delete table, print err message of INVALID_SQL_QUERY!! to all cases
     @Test
     @DisplayName("PART 3: Update question: TEST 13: If all data is valid, but topic" +
-            " table is down, return -2" )
-    void if_all_data_valid_but_topic_table_is_deleted_return_minus_2 () {
-        assertEquals(-2,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+            " table is down, return -2")
+    void if_all_data_valid_but_topic_table_is_deleted_return_minus_2() {
+        assertEquals(-2, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
+
     //add todo
     //strange behaviour 4 times called error message of APPLICATION PROPERTIES FILE, wtf??
     //when we delete table, print err message of INVALID_SQL_QUERY!! to all cases
     @Test
     @DisplayName("PART 3: Update question: TEST 14: If all data is valid, but database" +
-            " down, return -2" )
-    void if_all_data_valid_but_database_is_down_return_minus_2 () {
-        assertEquals(-1,interactWithDb.updateQuestion("Cars","Fastest car on a planet?",
-                "Slowest car on a planet?",3, "Ymaaha"));
+            " down, return -2")
+    void if_all_data_valid_but_database_is_down_return_minus_2() {
+        assertEquals(-1, interactWithDb.updateQuestion("Cars", "Fastest car on a planet?",
+                "Slowest car on a planet?", 3, "Ymaaha"));
     }
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -290,7 +290,7 @@ class DaoQuestionTest {
     //////////////////////////////////////////////////////////////////////////////////////////////
     @Test
     @DisplayName("PART 4: Delete question: TEST 1: If topic is empty, return ")
-    void dele () {
-        assertEquals(1,interactWithDb.deleteQuestion("", "Fastest car on a planet?"));
+    void dele() {
+        assertEquals(1, interactWithDb.deleteQuestion("", "Fastest car on a planet?"));
     }
 }
