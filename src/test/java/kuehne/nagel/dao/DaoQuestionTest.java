@@ -77,90 +77,62 @@ class DaoQuestionTest {
     //////////////////////////////////// SAVE QUERY //////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////////////////////////
-    @Test
-    @DisplayName("PART 2: Save question: TEST 1: If we input empty string as a topic on saving query" +
-            " we will get -5 as error code indicator")
-    void no_topic_on_question_returns_0() {
-        assertEquals(-5, interactWithDb.saveQuestion("", "What is the fastest car on a planet?", 5, "Hurracan"));
-    }
 
     @Test
-    @DisplayName("PART 2: Save question: TEST 2: If we input empty question content on saving query " +
-            "we will get -4 as error code")
-    void no_question_on_question_returns_minus_one() {
-        assertEquals(-4, interactWithDb.saveQuestion("Cars", "", 5, "In 1996"));
+    void no_topic_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.saveQuestion("", "What sports do michael phelps?", 2, "Swimming"));
     }
-
     @Test
-    @DisplayName("PART 2: Save question: TEST 3: If we input difficulty level outside" +
-            "a range from 1 to 5 on saving query we will get -3 as error code")
-    void no_difficulty_lvl_on_question_returns_minus_two() {
-        assertEquals(-3, interactWithDb.saveQuestion("Cars", "What is the fastest car on a planet?", 0, "Yes"));
-        assertEquals(-3, interactWithDb.saveQuestion("Cars", "What is the fastest car on a planet?", 6, "At 2250 km/h"));
+    void no_question_on_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.saveQuestion("Cars", "", 5, "2003"));
     }
-
     @Test
-    @DisplayName("PART 2: Save question: TEST 4: If we have no answers on question then " +
-            "we will get -6")
-    void no_answers_on_question_returns_minus_three() {
-        assertEquals(-6, interactWithDb.saveQuestion("Cars", "What is the fastest car on a planet?", 3, ""));
+    void out_of_boundaries_difficulty_lvl_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.saveQuestion("Sport", "What sports do michael phelps?", 2, "Swimming"));
+        assertEquals(-3, interactWithDb.saveQuestion("Cars", "What is the year of tesla company foundation?", 5, "2003"));
     }
-
     @Test
-    @DisplayName("PART 2: Save question: TEST 5: If we have all needed values passed, but" +
-            "put topic on input, that doesn't exist, we will get -4")
-    void if_topic_doesnt_exist_returns_minus_four() {
-        assertEquals(0, interactWithDb.saveQuestion("Cartoons", "How old is Cartoon Network?", 5, "25 years"));
+    void no_answers_returns_ERROR_CODE_minus_3() {
+        assertEquals(-3, interactWithDb.saveQuestion("Cars", "What is the year of tesla company foundation?", 5, ""));
     }
-
     @Test
-    @DisplayName("PART 2: Save question: TEST 6: If we have topic inside db and" +
-            " passed to store data is valid, then return 1")
-    void if_everything_is_valid_then_return_1_and_data_will_be_stored_in_database() {
-        assertEquals(1, interactWithDb.saveQuestion("Cars", "What is your favourite car?", 5, "Cabrio"));
+    void if_topic_doesnt_exist_returns_ERROR_CODE_minus_4() {
+        assertEquals(-4, interactWithDb.saveQuestion("Cartoons", "How old is Cartoon Network?", 5, "25 years"));
     }
-    //OK
-    //TODO: BEFORE RUN MESS UP WITH APPLICATION.PROPERTIES FILE
+    @Test
+    void if_everything_is_valid_then_returns_1_and_data_will_be_stored_in_database() {
+        assertEquals(1, interactWithDb.saveQuestion("Cars", "What is the fastest car on a planet?", 4, "Thrust SSC"));
+    }
+    //TODO: BEFORE RUN, ENSURE, THAT QUESTION ALREADY EXISTS IN THE DATABASE
     /*@Test
-    @DisplayName("PART 2: Save question: TEST 7: If we have problems with database connection, we return -5")
-    void db_connection_lost_return_minus_1() {
-        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is Mitsubishi Motors?", 4, "53 years"));
+    void if_everything_is_valid_but_user_duplicates_question_on_given_topic_then_returns_ERROR_CODE_minus_5() {
+        assertEquals(-5, interactWithDb.saveQuestion("Cars", "What is the fastest car on a planet?", 4, "Thrust SSC"));
     }*/
-    //OK
-    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL RECORDS FROM RESPONSE TABLE
+    //TODO: BEFORE RUN MAKE UP TYPO IN APPLICATION.PROPERTIES FILE NAME
     /*@Test
-    @DisplayName("PART 2: Save question: TEST 8: If we delete response table, then" +
-            " query will return 0")
-    void if_empty_reponse_table_return_minus_1() {
-        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));
+    void type_in_app_properties_file_returns_ERROR_CODE_minus_0() {
+        assertEquals(0, interactWithDb.saveQuestion("Cars", "How old is Mitsubishi Motors?", 4, "53"));
     }*/
-    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL QUESTION FROM QUESTIONS TABLE
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL QUESTIONS FROM QUESTION TABLE
     /*@Test
-    @DisplayName("PART 2: Save question: TEST 9: If we delete all questions from" +
-            " question table, then -2 is returned")
-    void if_empty_question_table_return_minus_1() {
-        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));
+    void if_empty_question_table_returns_1_and_fill_it_with_new_data() {
+        assertEquals(1, interactWithDb.saveQuestion("Sport", "How old is Pele?", 5, "80"));
     }*/
-    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED TOPIC TABLE FROM A DATABASE
+    //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED TOPIC TABLE DATA FROM A TOPIC TABLE
    /*@Test
-    @DisplayName("PART 2: Save question: TEST 10: If topic doesn't exist in a database," +
-            " and the topic table itself is empty, return -1")
-    void all_tables_are_empty_return_minus_1() {
-        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));;
+    void all_tables_are_empty_returns_ERROR_CODE_minus_4
+   () {
+        assertEquals(-4, interactWithDb.saveQuestion("Math", "What sin of 90 degrees?", 1, "1"));;
     }*/
     //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED ALL TABLES FROM A DATABASE
    /*@Test
-    @DisplayName("PART 2: Save question: TEST 11: If tables in a QUIZ database doesn't" +
-            " exist, return -1")
-    void if_tables_are_down_return_empty_list() {
-       assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));;
+    void if_tables_are_down_returns_ERROR_CODE_minus_4() {
+       assertEquals(-4, interactWithDb.saveQuestion("Math", "How many kg in 1 liter?", 2, "1"));;
    }*/
     //TODO: BEFORE RUN ENSURE, THAT YOU HAVE DELETED DATABASE ITSELF
     /*@Test
-    @DisplayName("PART 2: Save question: TEST 12: If QUIZ database doesn't" +
-            " exist, return -1")
-    void if_database_is_down_return_minus_1() {
-        assertEquals(-1, interactWithDb.saveQuestion("Cars", "How old is MyDean", 1, "6 years"));;
+    void if_database_is_down_returns_ERROR_CODE_minus_4() {
+        assertEquals(-4, interactWithDb.saveQuestion("Cars", "What is the most stable model of Hyundai?", 3, "Getz"));;
     }*/
     //////////////////////////////////////////////////////////////////////////////////////////////
 
