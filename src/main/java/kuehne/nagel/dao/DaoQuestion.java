@@ -1,92 +1,34 @@
 package kuehne.nagel.dao;
 
-import kuehne.nagel.Answer;
-import kuehne.nagel.Question;
+import kuehne.nagel.*;
 import kuehne.nagel.exceptions.ApplicationPropertiesException;
 import kuehne.nagel.exceptions.CannotReachDatabaseException;
+import kuehne.nagel.exceptions.InternalDatabaseException;
 import lombok.Data;
 
 import java.sql.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import static kuehne.nagel.SQLQueryType.SAVE_QUERY;
+import static kuehne.nagel.SQLQueryType.SEARCH_QUERY;
 import static kuehne.nagel.SqlQueries.*;
-import static kuehne.nagel.utils.DatabaseConnectivityProblems.printConnectivityErrorMessage;
 import static kuehne.nagel.utils.ValidateInput.*;
-import static kuehne.nagel.utils.DatabaseFailures.*;
 
 @Data
-public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
+public class DaoQuestion implements DaoQuestionI {
 
-  /*  private static final String SQL_QUERY_SEARCH_QUESTION_BY_TOPIC =
-            "SELECT name,content,difficulty FROM topic INNER JOIN question ON topic.ID = question.topic_ID WHERE name LIKE ?";
-    private static final String SQL_QUERY_SAVE_QUESTION_TO_EXISTING_TOPIC = "INSERT INTO question (content, difficulty, topic_ID) VALUES (?,?,?)";
-    private static final String SQL_QUERY_TOPIC_ID_BY_TOPIC_NAME = "SELECT ID FROM topic WHERE name=?";
-    private static final String SQL_QUERY_QUESTION_ID_BY_QUESTION_NAME = "SELECT ID FROM question WHERE content=?";
-    private static final String SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION = "INSERT INTO response (answer, question_ID) VALUES (?,?)";
-    private static final String SQL_QUERY_RETRIEVE_UNUSED_ID = "SELECT MAX(ID) FROM ";
-    private static final String SQL_QUERY_CREATE_TOPIC = "INSERT INTO topic (name) VALUES (?)";
-    private static final String SQL_QUERY_TOPIC_ID_FROM_QUESTION_TABLE = "SELECT topic_ID FROM question WHERE content=?";
-    private static final String SQL_UPDATE_QUESTION_TO_EXISTING_TOPIC = "UPDATE question SET content=?, difficulty=? WHERE ID=?";
-    private static final String SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION = "DELETE FROM response WHERE question_ID=?";
-    //private static final String SQL_TRIGGER_TO_ADD_QUESTION_AND_ANSWER = "DELIMITER ^_^ CREATE TRIGGER trig BEFORE INSERT ON response FOR EACH ROW BEGIN INSERT INTO question(content, difficulty, topic_ID) values (?,?,?); END^_^";
-    private static final String SQL_QUERY_TO_DELETE_QUESTION = "DELETE FROM question WHERE ID=?";*/
-
-
+  /*  @Override
     public int deleteQuestion(String topic, String question) {
-
-        val
-        //int topic_ID;
         int question_ID;
-        int verify;
-
-        /*SearchTopicIDbyTopicNameUtil search_topic_id = new SearchTopicIDbyTopicNameUtil();
-        topic_ID = search_topic_id.searchTopicIDbyTopicName(topic);*/
-        //SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
         question_ID = getExistingQuestionIdUtil(question);
-
-
-        if (/*topic_ID == 0 || */question_ID == 0) {
-            //if (question_ID == 0) {
+        if (question_ID == 0) {
             System.out.println("No such a question...\n");
         }
-        //}
-       /* else if (question_ID > 0) {
-            return 0;
-        }*/
-        //   System.err.println(question_ID);
-        //   Question result_question;
-        // Connection connect = null;
-        //PreparedStatement def_query;
-        // PreparedStatement def_query2;
-
         try (Connection connect = DatabaseConnection.getConnectionToDb(0);
              PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_TO_DELETE_QUESTION);
         ) {
-            //connect = DatabaseConnection.getConnectionToDb(0);
-            /*if (connect == null) {
-                //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 2;
-            }*/
-            // connect.setAutoCommit(false);
-            //  def_query = connect.prepareStatement(SQL_QUERY_TO_DELETE_QUESTION);
-            //plug topic into '?' of SQL_QUERY_SEARCH...
-
             def_query.setInt(1, question_ID);
-
-            // System.out.println();
-            //ResultSet data = def_query.executeUpdate();
             def_query.executeUpdate();
-
-            /*def_query2 = connect.prepareStatement(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION);
-            for (Answer answer:answers
-                 ) {
-                def_query2.setString(1,answer.getAnswer());
-                def_query2.setInt(2, question_ID);
-                //TODO: Add UPDATE CASCADE to ALL FOREIGN KEYS IN SQL
-                def_query2.executeQuery();
-            }*/
-            //   connect.commit();
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
             return -2;
@@ -98,89 +40,32 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             return -1;
         }
         return 1;
-    }
-
-    /*public int saveQuestion (String question, int difficulty, String topic, List<Answer> answers, int topic_ID) throws SQLException {
-
-        //int topic_ID;
-        int question_ID;
-        int verify;
-
-
-        SearchQuestionIDbyQuestionName search_question_id = new SearchQuestionIDbyQuestionName();
-        question_ID = search_question_id.searchQuestionIdByQuestionName(question);
-        System.out.println("QUESTION ID IS "+question_ID);
-
-        if (question_ID == 0) {
-            //if (question_ID == 0) {
-               // GetUnusedId new_q_id = new GetUnusedId();
-                question_ID = getUnusedIdUtil("question") + 1;
-            } else {
-            VerifyQuestionDuplicate verification = new VerifyQuestionDuplicate();
-            verify = verification.verifyQuestionDuplicate(topic,question);
-            if (verify == 3) {
-                System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n");
-                return 0;
-            }
-            //return 1;
-        }
-
-     //   System.err.println(question_ID);
-     //   Question result_question;
-        Connection connect = null;
-        PreparedStatement def_query;
-        PreparedStatement def_query2;
-
-        try {
-            connect = DatabaseConnection.getConnectionToDb(0);
-            if (connect == null) {
-                //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 2;
-            }
-            connect.setAutoCommit(false);
-            def_query = connect.prepareStatement(SQL_QUERY_SAVE_QUESTION_TO_EXISTING_TOPIC);
-
-
-            def_query.setString(1, question);
-
-            def_query.setInt(2, difficulty);
-
-            def_query.setInt(3, topic_ID);
-
-            def_query.executeUpdate();
-
-
-            connect.commit();
-        } catch (Exception q) {
-            connect.rollback();
-            q.printStackTrace();
-        }
-        AddResponse response = new AddResponse();
-        response.addResponse(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION,answers,question_ID);
-        return 3;
     }*/
-    public int updateQuestion(String topic, String old_question, String new_content, int difficulty, String ... new_answers){ //List<Answer> answers) {
+
+   /* @Override
+    public int updateQuestion(String topic, String old_question, String new_content, int difficulty, String... new_answers) {
         if (new_content.isEmpty()) {
-            System.err.println("APPLICATION >>> Aborting to run (updateQuestion)...\n\t\t\t>>>" +
+            System.err.println("APPLICATION >>> Aborting to establish database connection...\n\t\t\t>>>" +
                     " PROBLEM ::: Cannot replace old question with empty string");
-            return 0;
+            return -3;
         }
-        List<Answer> answers = prepareAnswers(new_answers);
-        int validation = validateInputQuery(topic,old_question,difficulty,answers);
+        List<Response> answers = prepareAnswers(new_answers);
+        int validation = validateJDBCSaveQueryBeforeDbConnection(topic, old_question, difficulty, answers);
         if (validation < 1) {
             return validation;
         }
-        int notVerified = verifyQuestionDuplicateUtil(topic, old_question);
-        if (notVerified == 1) {
-            System.err.println("APPLICATION >>> Aborting to run SQL UPDATE query...\n\t\t\t>>>" +
-                    " PROBLEM 1 ::: Question, that doesn't exist, cannot be updated\n\t\t\t>>>" +
-                    " PROBLEM 2 ::: Topic, that doesn't exist, cannot be queried");
-            return notVerified;
+        int duplicates = verifyQuestionDuplicateUtil(topic.toLowerCase(), old_question.toLowerCase());
+        if (duplicates == -4) {
+            // printConnectivityErrorMessage(NO_TOPIC_OR_QUESTION);
+            return duplicates;
         }
         int question_ID;
-        question_ID = getExistingQuestionIdUtil(old_question);
-        //List<Answer> answers = prepareAnswers(new_answers);
-        try (Connection connect = DatabaseConnection.getConnectionToDb(0);
+
+        question_ID = getExistingQuestionIdUtil(old_question.toLowerCase());
+        if (question_ID < 0) {
+            return question_ID;
+        }
+        try (Connection connect = DatabaseConnection.getConnectionToDb(1);
              PreparedStatement def_query = connect.prepareStatement(SQL_UPDATE_QUESTION_TO_EXISTING_TOPIC);
         ) {
             def_query.setString(1, new_content);
@@ -198,110 +83,20 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
             return -1;
         }
-        deleteAnswer(SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION, question_ID);
-        addAnswer(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION, answers, question_ID);
-        return 3;
-    }
-
-    public int createTopic(String topic) throws SQLException {
-        int topic_ID;
-        int track = 0;
-
-        Connection connect = null;
-        PreparedStatement def_query;
-
-        try {
-            connect = DatabaseConnection.getConnectionToDb(0);
-            if (connect == null) {
-                return 2;
-            }
-
-            def_query = connect.prepareStatement(SQL_QUERY_CREATE_TOPIC);
-            def_query.setString(1, topic);
-            //plug topic into '?' of SQL_QUERY_SEARCH...
-            def_query.executeUpdate();
-
-        } catch (Exception q) {
-            q.printStackTrace();
+        int delete = deleteAnswer(question_ID);
+        if (delete < 1) {
+            return delete;
         }
-        return 0;
-    }
-
-    private int getTopicIdByTopicNameUtil(String topic) {
-        int topic_ID = 0;
-
-        try (Connection connect = DatabaseConnection.getConnectionToDb(0);
-             PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_TOPIC_ID_BY_TOPIC_NAME)) {
-            def_query.setString(1, topic);
-            ResultSet data = def_query.executeQuery();
-            while (data.next()) {
-                topic_ID = data.getInt("ID");
-            }
-        } catch (SQLException sqlex) {
-            printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return -2;
-        } catch (ApplicationPropertiesException apex) {
-            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
-            return 0;
-        } catch (CannotReachDatabaseException crdex) {
-            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
-            return -1;
+        int add = addResponse(answers, question_ID);
+        if (add < 1) {
+            return add;
         }
-        return topic_ID;
-    }
+        return 1;
+    }*/
 
-    public int getExistingQuestionIdUtil(String question) {
-        int track = 0;
-        if (question.isEmpty()) {
-            return -10;
-        }
-        int question_ID = 0;
-        //Connection connect = null;
-        // PreparedStatement def_query = null;
 
-        try (
-                Connection connect = DatabaseConnection.getConnectionToDb(1);
-                PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_QUESTION_ID_BY_QUESTION_NAME);
-        ) {
-           /* if (connect == null) {
-                //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 0;
-            }*/
-            def_query.setString(1, question);
-            ResultSet data = def_query.executeQuery();
-            while (data.next()) {
-                track++;
-
-                question_ID = data.getInt("ID");
-            }
-            if (track == 0) {
-                //System.out.println("\nNo questions defined in that topic...\n");
-                return -10;
-            }
-        } catch (SQLException sqlex) {
-            printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return -2;
-        } catch (ApplicationPropertiesException apex) {
-            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
-            return 0;
-        } catch (CannotReachDatabaseException crdex) {
-            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
-            return -1;
-        }
-        //throw new DaoException(sql_ex);
-        //System.err.println("\nError occurred inside DatabaseConnection class --> getConnectionToDb method\n");
-        //return null;
-        return question_ID;
-    }
-
-    public int getTopicIdFromQuestionTable(String question) {
-        int track = 0;
-        if (question.isEmpty()) {
-            return 0;
-        }
+    /*private int getTopicIdFromQuestionTable(String question) {
         int question_topic_ID = 0;
-        //  Connection connect = null;
-        // PreparedStatement def_query = null;
 
         try (Connection connect = DatabaseConnection.getConnectionToDb(1);
              PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_TOPIC_ID_FROM_QUESTION_TABLE);
@@ -309,14 +104,12 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             def_query.setString(1, question);
             ResultSet data = def_query.executeQuery();
             while (data.next()) {
-                track++;
-
                 question_topic_ID = data.getInt("topic_ID");
             }
-            /*if (track == 0) {
-                //System.out.println("\nNo questions defined in that topic...\n");
-                return 10;
-            }*/
+            if (question_topic_ID == 0) {
+                printConnectivityErrorMessage(NO_TOPIC_OR_QUESTION);
+                return -4;
+            }
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
             return -2;
@@ -328,175 +121,448 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             return -1;
         }
         return question_topic_ID;
-    }
+    }*/
 
-    /* public int getUnusedID(String table) throws SQLException {
 
-         if (table.isEmpty()) {
-             return 0;
-         }
-         int track = 0;
-         int unused_ID = 0;
-         Connection connect = null;
-         PreparedStatement def_query = null;
-
-         try {
-             connect = DatabaseConnection.getConnectionToDb();
-             if (connect == null) {
-                 return 0;
-             }
-
-             def_query = connect.prepareStatement(SQL_QUERY_RETRIEVE_UNUSED_ID + table);
-
-             ResultSet data = def_query.executeQuery();
-
-             while (data.next()) {
-                 track++;
-
-                 unused_ID = data.getInt("MAX(ID)");
-             }
-            /* if (track == 0) {
-                 return 0;
-             }*/
-  /*      } catch (SQLException sql_ex) {
-            throw new SQLException();
-        } finally {
-            connect.close();
-            def_query.close();
-        }
-        return unused_ID;
-    }
-*/
-    //TODO: FRESHLY ADDED
-    public List<Question> showAllQuestionsByTopic(String topic) {
-        if (topic.isEmpty()) {
-            System.err.println("APPLICATION >>> Aborting to establish database connection...\n\t\t\t>>>" +
-                    " ERROR ::: Empty string cannot be a topic");
-            return new LinkedList<>();
-        }
-        System.out.println("APPLICATION >>> Data is valid!");
-        List<Question> queryResult;
-        queryResult = showAllQuestionsByTopicUtil(topic.toLowerCase());
-        if (queryResult.isEmpty()) {
-            return queryResult;
-        }
+    @Override
+    public int searchAllQuestionsByTopic(String topic) {
+        Collection<DbRecord> queryResult;
+        Collection<Question> printData = new LinkedHashSet<>();
         int counter = 0;
-        System.out.println("\nAPPLICATION >>> Received data:\n");
-        for (Question question : queryResult) {
-            counter++;
-            System.out.println("\t\t\t(" + counter + ") Record:");
-            System.out.printf("\t\t\tTopic name ::: %s\n\t\t\tQuestion ::: %s\n\t\t\tDifficulty (1-5) ::: %d\n\n", question.getTopic_name(),
-                    question.getContent(), question.getDifficulty());
-        }/*catch () {
-            System.err.println("APPLICATION >>> Aborting to establish database connection...\n\t\t\t>>>" +
-                    " ERROR ::: Relevant database OR table in a database doesn't exist");
-            return new LinkedList<>();
-        }*/
-        return queryResult;
-    }
-
-    private List<Question> showAllQuestionsByTopicUtil(String topic) {
-        int track = 0;
-        List<Question> data = new LinkedList<>();
-        try (
-                Connection connect = DatabaseConnection.getConnectionToDb(0);
-                PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_SEARCH_QUESTION_BY_TOPIC)
-        ) {
-            def_query.setString(1, topic);
-            System.out.println(def_query);
-            ResultSet answer_from_db = def_query.executeQuery();
-            System.out.println(answer_from_db);
-            while (answer_from_db.next()) {
-
-                track++;
-                Question output = new Question(
-                        answer_from_db.getString("name"),
-                        answer_from_db.getString("content"),
-                        answer_from_db.getInt("difficulty")
+        try {
+            queryResult = searchAllQuestionsByTopicUtil(topic.toLowerCase(), SEARCH_QUERY);
+            for (DbRecord rec : queryResult
+            ) {
+                printData.add(new Question(
+                        rec.getTopic().getName(),
+                        rec.getQuestion().getContent(),
+                        rec.getQuestion().getDifficulty())
                 );
-                data.add(output);
             }
-            if (track == 0) {
-                System.err.println("APPLICATION >>> Aborting to execute SQL query...\n\t\t\t>>>" +
-                        " ERROR ::: Topic (" + topic + ") doesn't have any questions in a database");
-                return new LinkedList<>();
+            if (queryResult.isEmpty()) {
+                return 0;
             }
-        } catch (ApplicationPropertiesException apex) {
-            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
-            return new LinkedList<>();
-        } catch (CannotReachDatabaseException crdex) {
-            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
-            return new LinkedList<>();
-        } catch (SQLException sqlex) {
-            printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return new LinkedList<>();
+        } catch (InternalDatabaseException idex) {
+            idex.cannotProcessSqlQuery();
+            return -1;
         }
-        /*catch (NullPointerException nullex) {
-            DatabaseConnectivityProblems.printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return new LinkedList<>();
-        }*/
-        return data;
-    }
-
-    private List<Answer> prepareAnswers(String... answers) {
-        List<Answer> storedAnswers = new LinkedList<>();
-        for (String answer : answers) {
-            if (answer.isEmpty()) {
-                return null;
-            }
-            answer = answer.toLowerCase();
-            storedAnswers.add(new Answer(answer));
+        for (Question question : printData) {
+            counter++;
+            System.out.println("(" + counter + ") Record:");
+            System.out.printf("\tTopic name ::: %s\n\tQuestion ::: %s\n\tDifficulty (1-5) ::: %d\n\n", topic,
+                    question.getContent(), question.getDifficulty());
         }
-        return storedAnswers;
-    }
-
-    public int saveQuestion(String topic, String question, int difficulty, String... answers) {
-        int validation;
-        List<Answer> ready_answer;
-        ready_answer = prepareAnswers(answers);
-        validation = validateInputQuery(topic, question, difficulty, ready_answer);
-
-        if (validation < 1) {
-            return validation;
-        }
-        topic = topic.toLowerCase();
-        question = question.toLowerCase();
-        int topic_ID;
-        int queryResult;
-        System.out.println("APPLICATION >>> Data is valid!\n\t\t\t>>> Trying to connect to the database...");
-
-        // try {
-        topic_ID = getTopicIdByTopicNameUtil(topic);//searchTopicIDbyTopicNameUtil(topic);
-        //validation //= //validateSearchTopicByTopicName(topic_ID);
-        if (topic_ID < 1) {
-            return topic_ID;
-        }
-        queryResult = saveQuestionUtil(question, difficulty, topic, ready_answer, topic_ID);
-        if (queryResult == 0) {
-            System.err.println("APPLICATION >>> Aborting to insert a record...\n\t\t\t>>>" +
-                    " PROBLEM ::: Question ("+question+") already exists in ("+topic+") topic");
-            return -7;
-        }
-
-        // } catch (SQLException exep) {
-        //     System.err.println("ERROR! Undefined behaviour of the program... Forcing to shut down!!!");
-        //    return -8;
-        //  }
         return 1;
     }
 
-    private int saveQuestionUtil(String question, int difficulty, String topic, List<Answer> answers, int topic_ID) {
-        int question_ID;
-        int verify;
-        question_ID = getExistingQuestionIdUtil(question);
-        if (question_ID == -10) {
-            question_ID = assignUnusedIdUtil("question") + 1;
-        } else {
-           // VerifyQuestionDuplicate verification = new VerifyQuestionDuplicate();
-            verify = verifyQuestionDuplicateUtil(topic, question);
-            if (verify == 0) {
+
+    private Collection<DbRecord> searchAllQuestionsByTopicUtil(String topic, SQLQueryType searchType) throws InternalDatabaseException {
+
+        int userInputValidation = validateJDBCSearchQueryBeforeDbConnection(topic);
+        if (userInputValidation < 1) {
+            return new LinkedHashSet<>();
+        }
+
+        Collection<DbRecord> queryResult = new LinkedHashSet<>();
+        try (Connection connect = DatabaseConnection.getConnectionToDb()) {
+            if (searchType.equals(SEARCH_QUERY)) {
+                queryResult = findOnlyQuestions(topic, connect);
+            } else if (searchType.equals(SAVE_QUERY)) {
+                queryResult = findAllData(topic, connect);
+            }
+
+            if (queryResult.isEmpty()) {
+                return queryResult;
+            }
+
+        } catch (ApplicationPropertiesException apex) {
+            apex.printApplicationPropertiesError();
+            return new LinkedHashSet<>();
+        } catch (CannotReachDatabaseException crdex) {
+            crdex.cannotReachDatabaseError();
+            return new LinkedHashSet<>();
+        } catch (SQLException sqlex) {
+            throw new InternalDatabaseException();
+        }
+        return queryResult;
+    }
+
+
+    public int saveQuestion(String topic, String questionContent, int difficulty, String... responses) {
+        Collection<String> tranformedAnswers = new LinkedHashSet<>(Arrays.asList(responses));
+        tranformedAnswers.forEach(String::toLowerCase);
+        int validateInput = validateJDBCSaveQueryBeforeDbConnection(
+                topic,
+                questionContent,
+                difficulty,
+                tranformedAnswers
+        );
+
+        if (validateInput < 1) {
+            return validateInput;
+        }
+        return saveQuestionUtil(topic.toLowerCase(), questionContent.toLowerCase(), difficulty, tranformedAnswers, SAVE_QUERY);
+    }
+
+
+    private int saveQuestionUtil(String topic, String question, int difficulty, Collection<String> answers, SQLQueryType searchType) {
+        Collection<DbRecord> result_data;
+        try (Connection connect = DatabaseConnection.getConnectionToDb()) {
+            result_data = searchAllQuestionsByTopicUtil(topic, SAVE_QUERY);
+            if (result_data.isEmpty()) {
+                lazyAdd(topic, question, difficulty, answers, connect);
+                //return lazyAdd(topic, question, difficulty, answers, connect);
+            } else {
+
+                addQuestionRecord(result_data, connect, topic, question, difficulty);
+
+
+                result_data = searchAllQuestionsByTopicUtil(topic, SAVE_QUERY);
+                for (DbRecord d : result_data
+                ) {
+                    System.out.println(d.getQuestion().getContent());
+                }
+                System.out.println(question);
+                for (DbRecord response : result_data
+                ) {
+                    if (response
+                            .getQuestion()
+                            .getContent()
+                            .equals(question)) {
+                        System.out.println("Hello!");
+                        addResponseRecordById(response.getQuestion().getId(), connect, answers);
+                    }
+                }
+            }
+        } catch (ApplicationPropertiesException apex) {
+            apex.printApplicationPropertiesError();
+            return -1;
+        } catch (CannotReachDatabaseException crdex) {
+            crdex.cannotReachDatabaseError();
+            return -1;
+        } catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+            return -1;
+        } catch (InternalDatabaseException idex) {
+            idex.cannotProcessSqlQuery();
+            return -1;
+        }
+        return 1;
+    }
+
+
+    /**
+     * Execute UPDATE QUERY on database
+     *
+     * @param existingQuestion
+     * @param newQuestion
+     * @param topic
+     * @param difficulty
+     * @param answers
+     * @return if query has been successfully executed, return 1, otherwise 0
+     */
+    public int updateQuestion(String existingQuestion, String newQuestion, String topic, int difficulty, String... answers) {
+        Collection<String> fromArrayToSet = new LinkedHashSet<>(Arrays.asList(answers));
+        int validationResult = validateJDBCSaveQueryBeforeDbConnection(
+                topic,
+                existingQuestion,
+                difficulty,
+                fromArrayToSet
+        );
+        if (newQuestion.isEmpty()) {
+            return 0;
+        }
+        if (validationResult < 1) {
+            return 0;
+        }
+        return updateQuestionUtil(existingQuestion, newQuestion, topic, difficulty, fromArrayToSet, SQLQueryType.UPDATE_QUERY);
+    }
+
+
+    private int updateQuestionUtil(String existingQuestion, String newQuestion, String topic, int difficulty, Collection<String> answers, SQLQueryType searchType) {
+
+        //Set all to lower case
+        existingQuestion = existingQuestion.toLowerCase();
+        newQuestion = newQuestion.toLowerCase();
+        topic = topic.toLowerCase();
+
+        Collection<DbRecord> queryResult;
+        try (Connection connect = DatabaseConnection.getConnectionToDb();
+             PreparedStatement query = connect.prepareStatement(SQL_UPDATE_QUESTION_TABLE)) {
+            //SAVE_QUERY is chosen, because the output of it is large enough to start processing data
+            queryResult = searchAllQuestionsByTopicUtil(topic, SAVE_QUERY);
+            if (queryResult.isEmpty()) {
                 return 0;
             }
+            //only 1 iteration will execute
+            for (DbRecord d : queryResult
+            ) {
+                query.setString(1, newQuestion);
+                query.setInt(2, difficulty);
+                query.setInt(3, d.getTopic().getId());
+                query.setString(4, existingQuestion);
+                //before 'break' execute SQL command
+                query.addBatch();
+                query.executeUpdate();
+                break;
+            }
+            //Updated data has to be queried again, in order to bound answers
+            queryResult = searchAllQuestionsByTopicUtil(topic, SAVE_QUERY);
+            for (DbRecord response : queryResult
+            ) {
+                if (response
+                        .getQuestion()
+                        .getContent()
+                        .equals(newQuestion)
+                ) {
+                    deleteResponseRecordById(response
+                            .getQuestion()
+                            .getId(),
+                            connect
+
+                    );
+                    addResponseRecordById(response.getQuestion().getId(), connect,answers);
+                    }
+
+                }
+
+        } catch (ApplicationPropertiesException apex) {
+            apex.printApplicationPropertiesError();
+            apex.printStackTrace();
+            return -1;
+        } catch (CannotReachDatabaseException crdex) {
+            crdex.cannotReachDatabaseError();
+            crdex.printStackTrace();
+            return -1;
+        } catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+            return -1;
+        } catch (InternalDatabaseException idex) {
+            idex.cannotProcessSqlQuery();
+            idex.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+
+
+    private int updateResponse(int question_ID, Connection connect, Collection<String> answer) throws SQLException {
+
+        try (
+                PreparedStatement def_query = connect.prepareStatement(SQL_UPDATE_RESPONSE_TABLE)
+        ) {
+            for (String str : answer) {
+                def_query.setString(1, str);
+                def_query.setInt(2, question_ID);
+                //allows us to execute SQL at place and not at the end of connection!
+                def_query.addBatch();
+                def_query.executeUpdate();
+            }
+
+        } catch (SQLException sq) {
+            throw new SQLException();
+        }
+        return 1;
+    }
+
+    private int addQuestionRecord(Collection<DbRecord> result_data, Connection connect, String topic, String question, int difficulty) throws SQLException {
+        try (
+                PreparedStatement query = connect.prepareStatement(SQL_QUERY_SAVE_QUESTION_TO_EXISTING_TOPIC)
+        ) {
+            for (DbRecord dbr : result_data) {
+                query.setString(1, question);
+                query.setInt(2, difficulty);
+                query.setInt(3, dbr.getTopic().getId());
+                query.addBatch();
+                //trick to get only first value and not proceed forward
+                break;
+            }
+            query.executeUpdate();
+        }
+        return 1;
+    }
+
+    private int deleteResponseRecordById(int recordId, Connection connect) throws SQLException {
+        try (
+                PreparedStatement query = connect.prepareStatement(SQL_DELETE_RESPONSE_RECORD)
+        ) {
+            query.setInt(1,recordId);
+            query.addBatch();
+            query.executeUpdate();
+
+        } catch (SQLException sqlex) {
+            throw new SQLException();
+        }
+        return 1;
+    }
+
+    private int addResponseRecordById(int question_ID, Connection connect, Collection<String> answer) throws SQLException {
+        try (
+                PreparedStatement def_query = connect.prepareStatement(SQL_ADD_RESPONSE_RECORD)
+        ) {
+            for (String str : answer) {
+                System.out.println(str);
+                def_query.setString(1, str);
+                def_query.setInt(2, question_ID);
+                //allows us to execute SQL at place and not at the end of connection!
+                def_query.addBatch();
+                def_query.executeUpdate();
+            }
+        } catch (SQLException sq) {
+            throw new SQLException();
+        }
+        return 1;
+    }
+
+    public int deleteQuestion (String question) {
+        int validation = validateJDBCSearchQueryBeforeDbConnection(question);
+        if (validation < 1) {
+            return -1;
+        } else
+            return deleteQuestionUtil(question);
+    }
+    private int deleteQuestionUtil (String question) {
+        try (Connection connect = DatabaseConnection.getConnectionToDb();
+        PreparedStatement def_query = connect.prepareStatement(SQL_DELETE_RECORD);
+        ) {
+            def_query.setString(1, question);
+            def_query.executeUpdate();
+
+        } catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+            return -1;
+        } catch (ApplicationPropertiesException apex) {
+            apex.printApplicationPropertiesError();
+            apex.printStackTrace();
+            return -1;
+        } catch (CannotReachDatabaseException crdex) {
+            crdex.cannotReachDatabaseError();
+            crdex.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+    /*private Collection<String> prepareAnswers (String... answers) {
+        Collection<String> storedAnswers = new LinkedHashSet<>();
+        for (String answer : answers) {
+            if (answer.isEmpty()) {
+                return new LinkedList<>();
+            }
+            answer = answer.toLowerCase();
+            storedAnswers.add(answer);
+        }
+        return storedAnswers;
+    }*/
+
+    // @Override
+    // public int saveQuestion(String topic, String question, int difficulty, String... answers) {
+
+       /* int validation;
+        List<Response> ready_answer;
+        ready_answer = prepareAnswers(answers);
+        validation = validateJDBCSaveQueryBeforeDbConnection(topic, question, difficulty, ready_answer);
+        if (validation == -3) {
+            return validation;
+        }
+        topic = topic.toLowerCase();
+        question = question.toLowerCase();*/
+        /*int topic_ID;
+        int queryResult;
+        System.out.println("APPLICATION >>> Data is valid!\n\t\t\t>>> Trying to connect to the database...");
+        topic_ID = getTopicIdByTopicNameUtil(topic, question, difficulty, answers);
+        if (topic_ID == 0) {
+            return 0;
+        }*/
+      /*  int queryResult;
+        queryResult = saveQuestionUtil(question.toLowerCase(), difficulty, topic.toLowerCase(), answers);
+        return queryResult;
+    }*/
+
+    //private int getTopicIdByTopicNameUtil(String topic) {
+       /* int validation;
+
+        validation = validateJDBCSaveQueryBeforeDbConnection(topic, question, difficulty, answers);
+        if (validation == 0) {
+            return 0;
+        }*/
+
+    // topic = topic.toLowerCase();
+    //question = question.toLowerCase();
+       /* int topic_ID = 0;
+        try (Connection connect = DatabaseConnection.getConnectionToDb(0);
+             PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_TOPIC_ID_BY_TOPIC_NAME)) {
+            def_query.setString(1, topic.toLowerCase());
+            ResultSet data = def_query.executeQuery();
+            while (data.next()) {
+                topic_ID = data.getInt("ID");
+            }
+            if (topic_ID == 0) {
+                printConnectivityErrorMessage(NO_TOPIC_OR_QUESTION);
+                return 0;
+            }
+        } catch (SQLException sqlex) {
+            printConnectivityErrorMessage(INVALID_SQL_QUERY);
+            return 0;
+        } catch (ApplicationPropertiesException apex) {
+            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
+            return 0;
+        } catch (CannotReachDatabaseException crdex) {
+            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
+            return 0;
+        }
+        return topic_ID;
+    }
+
+    private int saveQuestionUtil(String question, int difficulty, String topic, String... answers) {
+        int topicTable = pingDatabaseTable("topic");
+        if (topicTable < 1) {
+            return topicTable;
+        }
+        int questionTable = pingDatabaseTable("question");
+        if (questionTable < 0) {
+            return questionTable;
+        }
+        int responseTable = pingDatabaseTable("response");
+        if (responseTable < 0) {
+            return responseTable;
+        }
+
+        int topic_ID;
+        List<Response> ready_answer;
+        ready_answer = prepareAnswers(answers);
+        int validation;
+        validation = validateJDBCSaveQueryBeforeDbConnection(topic, question, difficulty, ready_answer);
+        if (validation == 0) {
+            return 0;
+        }
+        System.out.println("\t\t\t>>> Data is valid!");
+
+
+
+
+        List<Question> list = searchAllQuestionsByTopic(topic);
+        for (Question q:list
+             ) {
+            System.out.println(q.getContent());
+        }
+        if (list.isEmpty()) {
+            return -1;
+        }
+        if(list.stream().anyMatch(q -> q.getContent().equals(question))) {
+            System.err.println("Question already exists in a db!\n");
+            return -1;
+        }
+         topic_ID = getTopicIdByTopicNameUtil(topic);
+        if (topic_ID == 0) {
+            return 0;
+        }
+        int question_ID;
+        question_ID = getExistingQuestionIdUtil(question);
+
+        if (question_ID == 0) {
+            question_ID = assignUnusedIdUtil("question");
+        } else if (question_ID == -1) {
+            return -1;
         }
         try (Connection connect = DatabaseConnection.getConnectionToDb(1);
              PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_SAVE_QUESTION_TO_EXISTING_TOPIC);
@@ -507,90 +573,117 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
             def_query.executeUpdate();
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return -2;
+            return -1;
         } catch (ApplicationPropertiesException apex) {
             printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
-            return 0;
+            return -1;
         } catch (CannotReachDatabaseException crdex) {
             printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
             return -1;
         }
-        return addAnswer(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION, answers, question_ID);
-    }
-  /*  private int searchTopicIDbyTopicNameUtil(String topic) {
+        return addResponse(ready_answer, question_ID);
+   }
 
-        int queryResult;
-        try {
-            queryResult = getTopicIdByTopicNameUtil(topic);
-            if (queryResult == -1) {
-                return -1;
-            } else if (queryResult == -2) {
-                return -2;
+
+    private int getExistingQuestionIdUtil(String question) {
+        int question_ID = 0;
+        try (
+                Connection connect = DatabaseConnection.getConnectionToDb(1);
+                PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_QUESTION_ID_BY_QUESTION_NAME);
+        ) {
+            def_query.setString(1, question);
+            ResultSet data = def_query.executeQuery();
+            while (data.next()) {
+                question_ID = data.getInt("ID");
             }
-        } catch (NullPointerException sqlex) {
+        } catch (SQLException sqlex) {
+            printConnectivityErrorMessage(INVALID_SQL_QUERY);
+            return -1;
+        } catch (ApplicationPropertiesException apex) {
+            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
+            return -1;
+        } catch (CannotReachDatabaseException crdex) {
+            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
             return -1;
         }
-        return queryResult;
-    }*/
+        return question_ID;
+    }
 
-    /*private int searchQuestionIdByQuestionName(String question) {
-        int queryResult;
-        //DaoQuestion daoq = new DaoQuestion();
-        try {
-            queryResult = getExistingQuestionIdUtil(question);
-            if (queryResult == 0) {
-                //System.out.println("\nNo such a question...\n");
-                return queryResult;
-            }
-        }
-        return queryResult;
-    }*/
-
-    public int addAnswer(String query, List<Answer> answers, int question_ID) {
-        // Connection connect = null;
-        //  PreparedStatement def_query;
-        // PreparedStatement def_query2;
-
+    private int addResponse(List<Response> answers, int question_ID) {
         try (Connection connect = DatabaseConnection.getConnectionToDb(1);
-             PreparedStatement def_query2 = connect.prepareStatement(query);
+             PreparedStatement def_query2 = connect.prepareStatement(SQL_QUERY_SAVE_ANSWER_TO_GIVEN_QUESTION);
         ) {
-            //connect = DatabaseConnection.getConnectionToDb(1);
-           /* if (connect == null) {
-                //System.err.println("\nError occurred inside Config class --> return_property method\n");
-                return 2;
-            }*/
-            //connect.setAutoCommit(false);
-            // def_query2 = connect.prepareStatement(query);
-            for (Answer answer : answers
+            for (Response answer : answers
             ) {
                 def_query2.setString(1, answer.getAnswer());
                 def_query2.setInt(2, question_ID);
-                //TODO: Add UPDATE CASCADE to ALL FOREIGN KEYS IN SQL
-                def_query2.executeQuery();
+                System.out.println(def_query2);
+                def_query2.executeUpdate();
             }
-            // connect.commit();
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
-            return -2;
+            return -1;
         } catch (ApplicationPropertiesException apex) {
             printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
-            return 0;
+            return -1;
         } catch (CannotReachDatabaseException crdex) {
             printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
             return -1;
         }
+        System.out.println("APPLICATION >>> SQL SAVE QUERY has been successfully executed....");
         return 1;
     }
 
-    public int assignUnusedIdUtil(String table) {
+    public List<String> getResponse(int question_ID) {
+        List<String> answers = new LinkedList<>();
+        try (Connection connect = DatabaseConnection.getConnectionToDb(1);
+             PreparedStatement def_query2 = connect.prepareStatement(SQL_QUERY_TO_GET_RESPONSE);
+        ) {
+            def_query2.setInt(1, question_ID);
+            ResultSet got_answers = def_query2.executeQuery();
+
+            while (got_answers.next()) {
+
+                answers.add(got_answers.getString("answer"));
+            }
+
+            if (answers.isEmpty()) {
+                return null;
+            }
+        } catch (SQLException sqlex) {
+            printConnectivityErrorMessage(INVALID_SQL_QUERY);
+            return new LinkedList<>();
+        } catch (ApplicationPropertiesException apex) {
+            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
+            return new LinkedList<>();
+        } catch (CannotReachDatabaseException crdex) {
+            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
+            return new LinkedList<>();
+        }
+        return answers;
+    }
+
+    public int addResponseOrAbort(int question_ID, String question) {
+        List<String> answers = getResponse(question_ID);
+        if (answers.isEmpty()) {
+            return 0;
+        } else if (answers.stream().anyMatch(answerName -> answerName.equals(question))) {
+            return 1;
+        } else if (answers == null) {
+
+        }
+        return -1;
+    }
+
+    private int assignUnusedIdUtil(String table) {
         int unused_ID = 0;
         try (Connection connect = DatabaseConnection.getConnectionToDb(1);
-             PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_RETRIEVE_UNUSED_ID + table);) {
-
+             PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_RETRIEVE_UNUSED_ID)) {
+            def_query.setString(1, table);
             ResultSet data = def_query.executeQuery();
 
             while (data.next()) {
-                unused_ID = data.getInt("MAX(ID)");
+                unused_ID = data.getInt("AUTO_INCREMENT");
             }
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
@@ -605,66 +698,28 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         return unused_ID;
     }
 
-    private int getUnusedIdUtil11111(String table) {
-        int queryResult;
-        queryResult = assignUnusedIdUtil(table);
-        if (queryResult == 0) {
-            System.out.println("\nDatabase connection problems... Check property file!\n");
-            return queryResult;
-        }
-        return queryResult;
-    }
-
     private int verifyQuestionDuplicateUtil(String topic, String question) {
         int q_t_id;
         int t_id;
-        q_t_id = getTopicIdFromQuestionTable(question);
+
         t_id = getTopicIdByTopicNameUtil(topic);
-        System.out.println(q_t_id +"    " + t_id);
-        if (q_t_id == t_id) {
-            if (q_t_id == 0) {
-                return 1;
-            }
-            return 0;
+        if (t_id < 1) {
+            return t_id;
         }
-            /*if (queryResult == 0) {
-                //System.out.println("\nNo such a question...\n");
-                return queryResult;
-            }*/
-        return 1;
+        q_t_id = getTopicIdFromQuestionTable(question);
+        if (q_t_id < 1) {
+            return q_t_id;
+        } else if (q_t_id == t_id) {
+            return 2;
+        } else
+            return -4;
     }
 
-    /* private int searchQuestionIdByQuestionName (String question) {
-         int queryResult;
-         DaoQuestion daoq = new DaoQuestion();
-         try {
-             queryResult = daoq.getExistingQuestionIdUtil(question);
-             if (queryResult == 0) {
-                 //System.out.println("\nNo such a question...\n");
-                 return queryResult;
-             }
-         } catch (
-                 SQLException exep) {
-             return 0;
-         }
-         return queryResult;
-     }*/
-    private int deleteAnswer(String query, int question_ID) {
-        // Connection connect = null;
-        // PreparedStatement def_query;
-        //PreparedStatement def_query2;
+    private int deleteAnswer(int question_ID) {
         try (Connection connect = DatabaseConnection.getConnectionToDb(1);
-             PreparedStatement def_query = connect.prepareStatement(query);) {
-            //connect = DatabaseConnection.getConnectionToDb(1);
-          /* if (connect == null) {
-               //System.err.println("\nError occurred inside Config class --> return_property method\n");
-               return 2;
-           }*/
-            //  connect.setAutoCommit(false);
-            // def_query = connect.prepareStatement(query);
+             PreparedStatement def_query = connect.prepareStatement(SQL_DELETE_ANSWERS_OF_EXISTING_QUESTION)) {
             def_query.setInt(1, question_ID);
             def_query.executeUpdate();
-            connect.commit();
         } catch (SQLException sqlex) {
             printConnectivityErrorMessage(INVALID_SQL_QUERY);
             return -2;
@@ -677,5 +732,115 @@ public class DaoQuestion extends DatabaseConnection implements DaoQuestionI {
         }
         return 1;
     }
-}
 
+    public int pingDatabaseTable(String table) {
+        System.out.println("APPLICATION >>> Establishing handshake with a database...");
+        List<Integer> identifications = new LinkedList<>();
+        try (
+                Connection connect = DatabaseConnection.getConnectionToDb(0);
+                PreparedStatement def_query = connect.prepareStatement(SQL_QUERY_TO_PING_TABLE + table.toLowerCase())
+        ) {
+            System.out.println("\t\t\t>>> Pinging (" + table.toLowerCase() + ") table...");
+            ResultSet answer_from_db = def_query.executeQuery();
+            while (answer_from_db.next()) {
+                identifications.add(answer_from_db.getInt("id"));
+            }
+            if (identifications.isEmpty()) {
+                if (table.equals("topic"))
+                    printConnectivityErrorMessage(NO_TOPIC_OR_QUESTION);
+                return 0;
+            }
+        } catch (SQLException sqlex) {
+            printConnectivityErrorMessage(INVALID_SQL_QUERY);
+            return -1;
+        } catch (ApplicationPropertiesException apex) {
+            printConnectivityErrorMessage(TYPO_APPLICATION_PROPERTIES_FILE_NAME);
+            return -1;
+        } catch (CannotReachDatabaseException crdex) {
+            printConnectivityErrorMessage(APPLICATION_PROPERTIES_FILE_FAILURE);
+            return -1;
+        }
+        System.out.println("\t\t\t>>> Table (" + table + ") exists in a database!");
+        return 1;
+    }*/
+    private Collection<DbRecord> findAllData(String topic, Connection connect) throws SQLException, CannotReachDatabaseException, ApplicationPropertiesException {
+        //topic = topic.toLowerCase();
+        Collection<DbRecord> fullListOfQuestions = new LinkedHashSet<>();
+        try (PreparedStatement query = connect.prepareStatement(SQL_INNER_JOIN_FOR_SAVE)) {
+            query.setString(1, topic);
+            ResultSet queryResult = query.executeQuery();
+            while (queryResult.next()) {
+                Topic topicAsObject = new Topic(
+                        queryResult.getInt("TOPIC_ID"),
+                        queryResult.getString("name")
+                );
+                Question questionAsObject = new Question(
+                        queryResult.getInt("Q_ID"),
+                        queryResult.getString("content"),
+                        queryResult.getInt("difficulty"),
+                        queryResult.getInt("TOPIC_ID")
+                );
+                DbRecord record = new DbRecord(topicAsObject, questionAsObject);
+                fullListOfQuestions.add(record);
+            }
+        }
+        return fullListOfQuestions;
+    }
+
+    /**
+     * Will retrieve overview about questions, that are added inside provided topic
+     * @param topic
+     * @param connect
+     * @return filled with data Set, if everything is good, otherwise - empty Set
+     * @throws SQLException
+     * @throws CannotReachDatabaseException
+     * @throws ApplicationPropertiesException
+     */
+    private Collection<DbRecord> findOnlyQuestions(String topic, Connection connect) throws SQLException, CannotReachDatabaseException, ApplicationPropertiesException {
+        Collection<DbRecord> listOfQuestions = new LinkedHashSet<>();
+        try (PreparedStatement query = connect.prepareStatement(SQL_QUERY_SEARCH_QUESTION_BY_TOPIC)) {
+            query.setString(1, topic);
+            ResultSet queryResult = query.executeQuery();
+            while (queryResult.next()) {
+                Topic topicAsObject = new Topic(
+                        queryResult.getString("name")
+                );
+                Question questionAsObject = new Question(
+                        queryResult.getString("content"),
+                        queryResult.getInt("difficulty")
+                );
+                DbRecord record = new DbRecord(topicAsObject, questionAsObject);
+                listOfQuestions.add(record);
+            }
+        }
+        return listOfQuestions;
+    }
+
+
+
+    private int lazyAdd(String topic, String question, int difficulty, Collection<String> answers, Connection connect) throws SQLException {
+        try (
+                PreparedStatement insertAnswers = connect.prepareStatement("INSERT INTO response(answer,question_ID)VALUES(?,(SELECT ID FROM question WHERE content=?))");
+                PreparedStatement insertQuestion = connect.prepareStatement("INSERT INTO question(content,difficulty,topic_ID) VALUES(?,?,(SELECT ID FROM topic WHERE name=?))")
+        ) {
+            insertQuestion.setString(1, question);
+            insertQuestion.setInt(2, difficulty);
+            insertQuestion.setString(3, topic);
+            insertQuestion.addBatch();
+            insertQuestion.executeUpdate();
+
+            for (String ans : answers
+            ) {
+                insertAnswers.setString(1, ans);
+                insertAnswers.setString(2, question);
+                insertAnswers.addBatch();
+                insertAnswers.executeUpdate();
+            }
+
+        } catch (SQLException sqlex) {
+            sqlex.printStackTrace();
+            return -1;
+        }
+        return 1;
+    }
+}
