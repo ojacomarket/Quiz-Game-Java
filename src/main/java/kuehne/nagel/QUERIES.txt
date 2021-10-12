@@ -1,5 +1,0 @@
-Search Question By Topic::
-
-"SELECT content, difficulty, name FROM question INNER JOIN topic ON question.topic_ID = topic.ID WHERE UPPER(name) LIKE UPPER(?)";
-
-

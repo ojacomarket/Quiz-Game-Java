@@ -1,13 +1,14 @@
 package kuehne.nagel.dao;
 
-import kuehne.nagel.Question;
-
 import java.sql.SQLException;
-import java.util.List;
 
 public interface DaoQuestionI {
 
-    List<Question> showAllQuestionsByTopic(String topic) throws SQLException;
+    int searchAllQuestionsByTopic(String topic) throws SQLException;
 
-    //  public void saveQuestion(Question question, Answer answers_for_question) throws DaoException;
+    int saveQuestion(String topic, String question, int difficulty, String... answers);
+
+    int updateQuestion(String topic, String old_question, String new_content, int difficulty, String... new_answers);
+
+    int deleteQuestion(String question);
 }

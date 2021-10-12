@@ -1,20 +1,16 @@
-package kuehne.nagel;
+package kuehne.nagel.data;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class Answer {
-
-    private int id;
+@NoArgsConstructor
+public class Response extends DbRecord {
     @NonNull
     private String answer;
     @NonNull
     private int question_id;
-
-    public Answer(String answer) {
-        this.answer = answer;
-    }
 }
